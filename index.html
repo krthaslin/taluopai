@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DESTINY PROTOCOL V19 DEBUG</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 核心修复 1：彻底禁止浏览器自动放大文字 --- */
+        html {
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+
+        :root {
+            --void-bg: #050505;
+            --card-w: 135px;
+            --card-h: 240px;
+            --gold: #d4af37;
+            --gold-dim: rgba(212, 175, 55, 0.5);
+            --neon: #9d00ff;
+        }
+
+        @media (max-width: 768px) {
+            :root { --card-w: 90px; --card-h: 160px; }
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--void-bg);
+            color: white;
+            font-family: 'Noto Serif SC', serif; 
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%);
+            z-index: -1;
+            transition: opacity 1s;
+        }
+
+        .intro-layer {
+            position: absolute;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .crystal-ball {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(157, 0, 255, 0.5), #220033 90%);
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.4), inset -10px -10px 20px rgba(0,0,0,0.8);
+            position: relative;
+            margin-bottom: 40px;
+            animation: floatBall 6s ease-in-out infinite;
+        }
+        
+        @media (max-width: 768px) { .crystal-ball { width: 110px; height: 110px; margin-bottom: 30px; } }
+
+        .crystal-ball::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(255, 215, 0, 0.1) 60%, transparent 70%);
+            animation: pulseInner 3s infinite;
+        }
+
+        .input-group { position: relative; width: 280px; max-width: 80%; text-align: center; }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 30px;
+            color: var(--gold);
+            font-size: 16px;
+            padding: 15px 0;
+            text-align: center;
+            outline: none;
+            margin-bottom: 25px;
+            transition: 0.3s;
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+        }
+
+        button:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+
+        .vortex-container {
+            position: absolute;
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s;
+        }
+
+        .card-ring {
+            position: absolute;
+            width: 0; height: 0;
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: transform 2s ease-out;
+        }
+
+        .tarot-card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            left: calc(var(--card-w) / -2);
+            top: calc(var(--card-h) / -2);
+            border-radius: 8px;
+            transform-style: preserve-3d;
+            transition: transform 1s, opacity 1s;
+            cursor: default;
+            background-color: #222; 
+        }
+
+        .face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            overflow: hidden; 
+            transition: background-image 0.3s;
+        }
+
+        .face.back {
+            background-color: #111;
+            border: 1px solid #444;
+            background-image: 
+                linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%),
+                linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            z-index: 2;
+        }
+        .face.back.has-skin {
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            border: none;
+        }
+
+        .face.front {
+            transform: rotateY(180deg);
+            z-index: 1;
+            background-color: #000;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* --- 电脑端默认样式 --- */
+        .content-overlay {
+            background: rgba(0, 0, 0, 0.85); 
+            width: 100%; height: 100%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            padding: 24px; 
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.5s;
+            box-shadow: inset 0 0 0 1px var(--gold-dim);
+            outline: 1px solid rgba(212, 175, 55, 0.6);
+            outline-offset: -6px;
+        }
+        
+        .face.front.loaded .content-overlay { opacity: 1; }
+
+        .title-group { margin-bottom: 20px; text-align: center; }
+        .roman-num { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 12px; letter-spacing: 0px; margin-bottom: 5px; }
+        .face.front h3 { margin: 0; color: var(--gold); font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+        .sub-title { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; margin-top: 5px; border-top: 1px solid var(--gold-dim); padding-top: 5px; display: inline-block; }
+        .face.front p { font-size: 10px; line-height: 2.0; color: #ddd; margin: 0; text-align: justify; width: 100%; font-weight: 300; }
+
+        /* --- 核心修复 2：移动端字体控制 --- */
+        @media (max-width: 768px) {
+            /* 增大内边距，把文字往中间挤，解决"太靠边" */
+            .content-overlay { 
+                padding: 14px; 
+                outline-offset: -3px; 
+            }
+
+            .title-group { margin-bottom: 6px; }
+
+            /* 字体大小说明：
+               因为有 scale(3.2)，所以这里的 5px 实际上看起来是 16px。
+               设置了 text-size-adjust: none 后，浏览器会老实执行 5px，不再乱放大。
+            */
+            .roman-num { font-size: 5px; margin-bottom: 1px; }
+
+            .face.front h3 { 
+                font-size: 6px; /* 视觉约 19px */
+                letter-spacing: 0.5px; 
+                margin: 2px 0;
+            } 
+
+            .sub-title { 
+                font-size: 3px; /* 视觉约 10px */
+                margin-top: 2px; 
+                padding-top: 1px; 
+                border-top-width: 0.5px;
+            }
+
+            .face.front p { 
+                font-size: 3.5px; /* 视觉约 11px */
+                line-height: 1.8; 
+                text-align: justify;
+                color: #e0e0e0;
+            }
+        }
+
+        .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
+
+        .tarot-card.chosen {
+            pointer-events: auto;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2);
+            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s; 
+            z-index: 999;
+        }
+
+        .tarot-card.flipped {
+            z-index: 1000 !important;
+            box-shadow: 0 0 100px var(--neon);
+            transform: translate3d(0, 0, 400px) rotateY(180deg) scale(1.5) !important;
+        }
+
+        @media (max-width: 768px) {
+            .tarot-card.flipped { transform: translate3d(0, 0, 100px) rotateY(180deg) scale(3.2) !important; }
+        }
+
+        @keyframes floatBall { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+        /* 调试器样式 */
+        #debug-console {
+            position: fixed; top: 0; left: 0; width: 100%; 
+            background: rgba(255, 0, 0, 0.8); color: white; 
+            font-size: 12px; padding: 10px; z-index: 9999; 
+            display: none; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="debug-console"></div> <div class="bg-gradient" id="main-bg"></div>
+
+    <div class="intro-layer" id="intro-ui">
+        <div class="crystal-ball"></div>
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="输入所求之事..." autocomplete="off">
+            <button onclick="startRitual()">开启法阵</button>
+        </div>
+    </div>
+
+    <div class="vortex-container" id="vortex-con">
+        <div class="card-ring" id="card-ring"></div>
+    </div>
+
+    <script>
+        // --- 核心修复 3：屏幕调试器 (出错时直接显示在手机顶部) ---
+        function logError(msg) {
+            const el = document.getElementById('debug-console');
+            el.style.display = 'block';
+            el.innerText = "❌ 错误: " + msg;
+            console.error(msg);
+        }
+
+        const cardRing = document.getElementById('card-ring');
+        const introUi = document.getElementById('intro-ui');
+        const mainBg = document.getElementById('main-bg');
+        
+        const isMobile = window.innerWidth < 768;
+        const TOTAL_CARDS = isMobile ? 12 : 24; 
+        
+        let allCards = [];
+        let pendingAiResult = null; 
+        let activeFlippedCard = null; 
+
+        const SKINS = {
+            MOON: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png", 
+            STAR: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png", 
+            SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
+        };
+
+        // 彻底移除了 LOCAL_BACKUP，没有数据就是没有数据
+
+        async function preFetchAiResult(query) {
+            try {
+                const response = await fetch('/api/tarot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                // 检查 HTTP 状态码
+                if (response.status !== 200) {
+                    throw new Error(`API报错: ${response.status} (检查Key或Vercel日志)`);
+                }
+                
+                const data = await response.json();
+                
+                // 检查数据完整性
+                if (!data || !data.title) {
+                    throw new Error("AI 返回了空数据");
+                }
+
+                pendingAiResult = data; 
+
+                if (activeFlippedCard) {
+                    renderCardContent(activeFlippedCard, data);
+                }
+
+            } catch (e) {
+                // 将错误直接显示在屏幕上，方便你截图给我看
+                logError(e.message);
+                
+                // 即使出错，也不显示假数据，显示错误卡片
+                pendingAiResult = {
+                    id: "ERR",
+                    title: "连接中断",
+                    enTitle: "CONNECTION LOST",
+                    desc: "无法连接到命运主脑。请检查 API Key 配置或网络状态。\n" + e.message
+                };
+                
+                if (activeFlippedCard) {
+                    renderCardContent(activeFlippedCard, pendingAiResult);
+                }
+            }
+        }
+
+        function startRitual() {
+            const query = document.getElementById('user-input').value;
+            if(!query) return alert("心诚则灵，请输入问题...");
+            introUi.classList.add('hidden');
+            preFetchAiResult(query);
+            generateVortex();
+        }
+
+        function generateVortex() {
+            const radius = isMobile ? 220 : 550; 
+            const zPush = isMobile ? -350 : 0; 
+            const yJitter = isMobile ? 180 : 300; 
+            
+            if(isMobile) {
+                cardRing.style.transform = `translateZ(${zPush}px)`;
+            }
+
+            for(let i=0; i<TOTAL_CARDS; i++) {
+                const card = document.createElement('div');
+                card.className = 'tarot-card';
+                card.innerHTML = `<div class="face back"></div><div class="face front"><div class="content-overlay"></div></div>`;
+
+                card.style.transform = `translate3d(0, 800px, -2000px)`; 
+                cardRing.appendChild(card);
+                allCards.push(card);
+
+                setTimeout(() => {
+                    const angle = (360 / TOTAL_CARDS) * i;
+                    const randomY = (Math.random() - 0.5) * yJitter; 
+                    card.style.opacity = 1;
+                    card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px) translateY(${randomY}px)`;
+                }, 100 + (i * 30));
+            }
+
+            setTimeout(performSelection, 3000);
+        }
+
+        function performSelection() {
+            const step = Math.floor(TOTAL_CARDS / 3);
+            const indices = [0, step, step * 2];
+            const chosenCards = indices.map(i => allCards[i]);
+
+            allCards.forEach((card, idx) => {
+                if(!indices.includes(idx)) card.classList.add('vanish');
+            });
+
+            chosenCards.forEach((card) => {
+                card.style.transition = 'transform 0.4s ease-in'; 
+                card.style.transform = `translate3d(0, 0, -2000px) rotateY(0deg)`;
+            });
+
+            setTimeout(() => {
+                chosenCards.forEach((card, i) => {
+                    const spread = isMobile ? 130 : 200;
+                    let xPos = 0; if(i === 0) xPos = -spread; if(i === 2) xPos = spread;
+                    card.offsetHeight; 
+                    card.className = 'tarot-card chosen'; 
+                    let rotY = 0; if(i === 0) rotY = 10; if(i === 2) rotY = -10;
+
+                    const yOffset = isMobile ? -50 : 0;
+                    const zPop = isMobile ? 120 : 200; 
+                    const baseScale = 1.0;
+
+                    card.style.transform = `translate3d(${xPos}px, ${yOffset}px, ${zPop}px) rotateY(${rotY}deg) scale(${baseScale})`;
+                    
+                    const backFace = card.querySelector('.face.back');
+                    const frontFace = card.querySelector('.face.front');
+                    let skinUrl = '';
+                    if (i === 0) skinUrl = SKINS.MOON;
+                    if (i === 1) skinUrl = SKINS.STAR;
+                    if (i === 2) skinUrl = SKINS.SUN;
+                    
+                    const img = new Image();
+                    img.onload = () => {
+                        backFace.classList.add('has-skin');
+                        backFace.style.backgroundImage = `url('${skinUrl}')`;
+                        frontFace.style.backgroundImage = `url('${skinUrl}')`;
+                    };
+                    img.src = skinUrl;
+
+                    card.onclick = () => revealContent(card);
+                });
+            }, 500); 
+        }
+
+        function renderCardContent(card, data) {
+            const overlay = card.querySelector('.content-overlay');
+            const frontFace = card.querySelector('.face.front');
+            
+            const roman = data.id || "??";
+            const title = data.title || "未知";
+            const enTitle = data.enTitle || ""; 
+            const desc = data.desc || "......";
+
+            overlay.innerHTML = `
+                <div class="title-group">
+                    <div class="roman-num">${roman}</div>
+                    <h3>${title}</h3>
+                    <div class="sub-title">${enTitle}</div>
+                </div>
+                <p>${desc}</p>
+            `;
+            frontFace.classList.add('loaded');
+        }
+
+        function revealContent(card) {
+            if(card.classList.contains('flipped')) return;
+            activeFlippedCard = card; 
+            mainBg.style.opacity = '0.3'; 
+            
+            document.querySelectorAll('.chosen').forEach(c => {
+                if(c !== card) { c.style.opacity = 0; c.style.pointerEvents = 'none'; }
+            });
+
+            if (pendingAiResult) {
+                renderCardContent(card, pendingAiResult);
+            } else {
+                const overlay = card.querySelector('.content-overlay');
+                const frontFace = card.querySelector('.face.front');
+                overlay.innerHTML = `
+                    <div class="title-group">
+                        <div class="roman-num">...</div>
+                        <h3>连接中</h3>
+                        <div class="sub-title">CONNECTING</div>
+                    </div>
+                    <p style="text-align:center">正在建立量子链接...</p>
+                `;
+                frontFace.classList.add('loaded');
+            }
+            card.classList.add('flipped');
+        }
+    </script>
+</body>
+</html>
