@@ -259,15 +259,48 @@
             font-weight: 300;
         }
 
-        /* --- 移动端适配 (IMAX模式) --- */
+        /* --- 移动端适配 (IMAX 修正版) --- */
         @media (max-width: 768px) {
-            .content-overlay { padding: 10px; outline-offset: -3px; }
-            .title-group { margin-bottom: 8px; }
-            .roman-num { font-size: 8px; margin-bottom: 2px; }
-            .face.front h3 { font-size: 14px; letter-spacing: 1px; margin: 2px 0;} 
-            .sub-title { font-size: 2px; margin-top: 2px; padding-top: 2px; transform: scale(0.9);}
-            /* 移动端极致小字号 */
-            .face.front p { font-size: 3px; line-height: 1.6; }
+            /* 1. 容器边距：加大边距，把文字往中间挤，解决"太靠边"的问题 */
+            /* 12px * 3.2 = 视觉上约 38px 的留白，很有呼吸感 */
+            .content-overlay { 
+                padding: 14px; outline-offset: -3px; }
+
+            /* 2. 标题组间距 */
+            .title-group { margin-bottom: 6px; }
+
+            /* 3. 罗马数字：极小 */
+            .roman-num { 
+                font-size: 5px; /* 视觉约 16px */
+                margin-bottom: 1px; 
+            }
+
+            /* 4. 中文标题：关键调整 */
+            /* 5px * 3.2 = 视觉 16px，精致且不会换行 */
+            .face.front h3 { 
+                font-size: 5px; 
+                letter-spacing: 0.5px; 
+                margin: 2px 0;
+                border-bottom-width: 0.5px; /* 线条也要变细 */
+                padding-bottom: 2px;
+            } 
+
+            /* 5. 英文副标题 */
+            .sub-title { 
+                font-size: 3px; /* 视觉约 9.6px，像一行精致的装饰码 */
+                margin-top: 2px; 
+                padding-top: 1px; 
+                border-top-width: 0.5px;
+            }
+
+            /* 6. 正文文字：必须极小 */
+            /* 3.5px * 3.2 = 视觉 11.2px，非常舒适的阅读字号 */
+            .face.front p { 
+                font-size: 3.5px; 
+                line-height: 1.8; 
+                text-align: justify; /* 两端对齐 */
+                color: #e0e0e0; /* 稍微亮一点，保证小字可读性 */
+            }
         }
 
         .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
@@ -503,4 +536,5 @@
 </body>
 
 </html>
+
 
