@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.0 AI-CORE</title>
+    <title>DESTINY PROTOCOL V4.1 FINAL POLISH</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,13 +15,12 @@
         /* 1. 核心修复：防止键盘顶起页面布局 */
         html, body { 
             margin: 0; padding: 0; width: 100%; 
-            /* 不再用 100vh，而是由 JS 设定固定高度 */
             overflow: hidden; 
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
             perspective: 1200px;
-            position: fixed; /* 强制固定，不随键盘滚动 */
+            position: fixed;
             left: 0; top: 0; right: 0; bottom: 0;
         }
 
@@ -41,13 +40,16 @@
             z-index: -1;
         }
 
-        /* --- 舞台区 --- */
+        /* --- 舞台区 (修改点 1：整体下移) --- */
         .stage-area {
             flex: 60; width: 100%;
             display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
+            /* 改为靠下对齐 */
+            justify-content: flex-end; 
+            align-items: center;
             position: relative; z-index: 10;
-            padding: 20px;
+            /* 增加底部内边距，把内容往上顶一点，避免太靠底 */
+            padding-bottom: 100px; 
         }
 
         /* 魔法阵 */
@@ -57,7 +59,8 @@
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 20;
             transition: all 0.8s ease;
-            top: 35%; transform: translateY(-50%);
+            /* 配合justify-content: flex-end，这里稍微调整垂直位置 */
+            top: 45%; transform: translateY(-50%);
         }
         .magic-circle-container:active { transform: translateY(-50%) scale(0.95); }
 
@@ -106,10 +109,12 @@
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
-        /* 牌堆 */
+        /* 牌堆 (修改点 1：同步下移) */
         .deck-stack {
             position: absolute; width: 80px; height: 140px;
-            top: 40%; left: 50%; margin-left: -40px; margin-top: -70px;
+            /* 从 40% 改为 60%，明显下移 */
+            top: 60%; 
+            left: 50%; margin-left: -40px; margin-top: -70px;
             z-index: 25; pointer-events: none; opacity: 0; 
             transition: opacity 1.5s ease-in;
         }
@@ -120,13 +125,13 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* 输入区 */
+        /* 输入区 (配合 stage-area 的 flex-end，这里不需要大改动，会自动靠下) */
         .controls-wrapper {
-            position: absolute; 
-            top: 55%; /* 物理位置居中偏下 */
+            position: relative; /* 改为相对定位，受 flex 控制 */
             width: 100%; display: flex; flex-direction: column; align-items: center;
             transition: all 0.5s ease;
             z-index: 30;
+            margin-top: auto; /* 确保贴着底部内边距 */
         }
         .input-box {
             width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
@@ -193,9 +198,13 @@
             display: flex; flex-direction: column; justify-content: flex-end;
             box-shadow: inset 0 0 0 1px var(--gold-dim);
         }
+        
+        /* (修改点 2：修复圆角漏光) */
         .front-content {
             padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
             border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px);
+            /* 关键：设置比父容器(6px)更小的底部圆角，确保不遮挡父容器的内阴影边框 */
+            border-radius: 0 0 4px 4px;
         }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
@@ -264,8 +273,7 @@
         }
         window.addEventListener('load', lockViewportHeight);
         window.addEventListener('resize', () => {
-            // 只有当高度变化很大时（比如横屏）才重置，忽略小幅变化（如键盘）
-            // 但为了简单稳健，通常 load 锁定一次即可应对大部分键盘弹起情况
+             // 可选：处理严重的屏幕旋转等情况
         });
 
         // 完整数据
@@ -303,7 +311,7 @@
             tornadoCards: [],
             animationFrame: null,
             synthesisShown: false,
-            aiSynthesis: null // 存储 AI 结果
+            aiSynthesis: null 
         };
 
         const trigger = document.getElementById('magic-trigger');
@@ -422,11 +430,9 @@
             state.destinyLocked = true;
             document.getElementById('slots-area').style.opacity = 1;
 
-            // ⚡️ 核心：立即触发 AI 请求
             fetchAiInterpretation(inputBox.value, state.selectedCards);
         }
 
-        // 异步请求 AI
         async function fetchAiInterpretation(query, cards) {
             console.log("正在请求 AI 解读...");
             try {
@@ -445,7 +451,6 @@
                 }
             } catch (e) {
                 console.error("AI 连接失败", e);
-                // 兜底文案，防止空白
                 state.aiSynthesis = "星象混沌，信号微弱。但牌面的启示已然清晰：过去的影响正在消退，当下的行动决定未来。请相信直觉的指引。";
             }
         }
@@ -529,14 +534,11 @@
             finalCon.style.opacity = 1;
             finalCon.style.pointerEvents = 'auto';
 
-            // 检查 AI 结果
             const aiTextElement = document.getElementById('ai-text');
             
             if (state.aiSynthesis) {
-                // 如果 AI 已经算好了
                 typeWriter(state.aiSynthesis, aiTextElement);
             } else {
-                // 如果网慢还没好，显示 Loading，轮询检查
                 aiTextElement.innerText = "正在接收来自深空的信号...";
                 const checkInterval = setInterval(() => {
                     if (state.aiSynthesis) {
