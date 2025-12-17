@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V3.6 FIXED</title>
+    <title>DESTINY PROTOCOL V4.0 AI-CORE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,12 +11,18 @@
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* 1. 核心修复：防止键盘顶起页面布局 */
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background-color: #050505; color: white;
+            margin: 0; padding: 0; width: 100%; 
+            /* 不再用 100vh，而是由 JS 设定固定高度 */
+            overflow: hidden; 
+            background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
             perspective: 1200px;
+            position: fixed; /* 强制固定，不随键盘滚动 */
+            left: 0; top: 0; right: 0; bottom: 0;
         }
 
         :root {
@@ -35,24 +41,22 @@
             z-index: -1;
         }
 
-        /* --- 区域 1: 舞台中心 (上方 60%) --- */
+        /* --- 舞台区 --- */
         .stage-area {
             flex: 60; width: 100%;
             display: flex; flex-direction: column;
-            justify-content: center; 
-            align-items: center;
+            justify-content: center; align-items: center;
             position: relative; z-index: 10;
             padding: 20px;
         }
 
-        /* 魔法阵容器 - 修复偏心问题 */
+        /* 魔法阵 */
         .magic-circle-container {
             position: absolute; 
             width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 20;
             transition: all 0.8s ease;
-            /* 确保它在视觉中心偏上一点 */
             top: 35%; transform: translateY(-50%);
         }
         .magic-circle-container:active { transform: translateY(-50%) scale(0.95); }
@@ -69,12 +73,11 @@
             border-color: #fff;
             animation: rotateFast 0.5s linear infinite; 
         }
-        /* 修复：使用 absolute 居中，不再用 left/top百分比猜测 */
         .magic-circle::before {
             content: ''; position: absolute; 
             width: 85%; height: 85%; border-radius: 50%;
             border: 1px solid var(--gold); border-top: 3px double var(--gold); border-bottom: 3px double var(--gold);
-            top: 0; left: 0; right: 0; bottom: 0; margin: auto; /* 绝对居中 */
+            top: 0; left: 0; right: 0; bottom: 0; margin: auto;
             animation: rotateSlow 12s linear infinite reverse;
         }
 
@@ -85,7 +88,7 @@
             animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风容器 */
+        /* 龙卷风 */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%;
             top: 0; left: 0; pointer-events: none;
@@ -103,13 +106,11 @@
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
-        /* 悬浮牌堆 */
+        /* 牌堆 */
         .deck-stack {
             position: absolute; width: 80px; height: 140px;
-            /* 居中定位 */
             top: 40%; left: 50%; margin-left: -40px; margin-top: -70px;
             z-index: 25; pointer-events: none; opacity: 0; 
-            /* 修复：放慢出现动画 */
             transition: opacity 1.5s ease-in;
         }
         .deck-card-static {
@@ -119,11 +120,10 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* 输入框容器 - 修复手机端重叠 */
+        /* 输入区 */
         .controls-wrapper {
             position: absolute; 
-            /* 放在法阵下方足够远的地方 */
-            top: 55%; 
+            top: 55%; /* 物理位置居中偏下 */
             width: 100%; display: flex; flex-direction: column; align-items: center;
             transition: all 0.5s ease;
             z-index: 30;
@@ -138,7 +138,7 @@
             height: 20px; transition: opacity 0.3s; text-shadow: 0 2px 4px black;
         }
 
-        /* 顶部命运回响 */
+        /* 顶部结果 */
         .final-display {
             position: absolute; top: 12%; width: 85%; max-width: 600px;
             text-align: center; opacity: 0; pointer-events: none;
@@ -155,7 +155,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- 区域 2: 底部卡槽 --- */
+        /* 卡槽区 */
         .slots-container {
             flex: 40; width: 100%;
             display: flex; justify-content: space-evenly; align-items: flex-start;
@@ -173,7 +173,7 @@
             color: #444; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
         }
 
-        /* --- 动态元素 --- */
+        /* 动画元素 */
         .flying-card {
             position: fixed; width: var(--card-w-mobile); height: var(--card-h-mobile);
             border-radius: 6px; transform-style: preserve-3d;
@@ -258,8 +258,17 @@
     </div>
 
     <script>
-        // --- 1. 修复后的完整 22 张大阿卡纳数据 ---
-        // 修复了 VI 恋人 (Lovers) 的图片链接
+        // 核心修复：锁定高度，防止键盘顶起
+        function lockViewportHeight() {
+            document.body.style.height = window.innerHeight + 'px';
+        }
+        window.addEventListener('load', lockViewportHeight);
+        window.addEventListener('resize', () => {
+            // 只有当高度变化很大时（比如横屏）才重置，忽略小幅变化（如键盘）
+            // 但为了简单稳健，通常 load 锁定一次即可应对大部分键盘弹起情况
+        });
+
+        // 完整数据
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
@@ -293,7 +302,8 @@
             cardsRevealed: 0,
             tornadoCards: [],
             animationFrame: null,
-            synthesisShown: false
+            synthesisShown: false,
+            aiSynthesis: null // 存储 AI 结果
         };
 
         const trigger = document.getElementById('magic-trigger');
@@ -306,7 +316,6 @@
         const controls = document.getElementById('controls');
         const finalCon = document.getElementById('final-con');
 
-        // 事件绑定
         trigger.addEventListener('mousedown', startChanneling);
         trigger.addEventListener('touchstart', (e) => { e.preventDefault(); startChanneling(); });
         
@@ -378,7 +387,6 @@
                 t.el.style.opacity = 0;
             });
 
-            // 修复：增加真空期，让龙卷风彻底消失后再显示牌堆 (呼吸感)
             setTimeout(() => {
                 tornadoCon.innerHTML = ''; 
                 showDeckStack();
@@ -390,7 +398,6 @@
             trigger.style.pointerEvents = 'none';
             controls.style.opacity = 0;
 
-            // 显示牌堆 (opacity transition set to 1.5s in CSS)
             deckStack.style.opacity = 1;
             
             setTimeout(() => {
@@ -407,9 +414,40 @@
 
         function lockDestiny() {
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
-            state.selectedCards = [shuffled[0], shuffled[1], shuffled[2]];
+            state.selectedCards = [
+                { ...shuffled[0], position: "过去" },
+                { ...shuffled[1], position: "现在" },
+                { ...shuffled[2], position: "未来" }
+            ];
             state.destinyLocked = true;
             document.getElementById('slots-area').style.opacity = 1;
+
+            // ⚡️ 核心：立即触发 AI 请求
+            fetchAiInterpretation(inputBox.value, state.selectedCards);
+        }
+
+        // 异步请求 AI
+        async function fetchAiInterpretation(query, cards) {
+            console.log("正在请求 AI 解读...");
+            try {
+                const response = await fetch('/api/tarot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, cards: cards })
+                });
+                
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.result && data.result.analysis) {
+                        state.aiSynthesis = data.result.analysis;
+                        console.log("AI 解读已就绪");
+                    }
+                }
+            } catch (e) {
+                console.error("AI 连接失败", e);
+                // 兜底文案，防止空白
+                state.aiSynthesis = "星象混沌，信号微弱。但牌面的启示已然清晰：过去的影响正在消退，当下的行动决定未来。请相信直觉的指引。";
+            }
         }
 
         function distributeCard() {
@@ -438,13 +476,11 @@
             `;
 
             const startRect = deckStack.getBoundingClientRect();
-            // 直接对齐，不需要手动计算偏移，因为 deckStack 已经居中
             card.style.left = startRect.left + 'px';
             card.style.top = startRect.top + 'px';
             document.body.appendChild(card);
 
             const endRect = targetSlot.getBoundingClientRect();
-            // 卡槽与卡片同尺寸 (80x140)，直接对齐 left/top
             const endX = endRect.left; 
             const endY = endRect.top;
 
@@ -490,13 +526,25 @@
 
         function showSynthesis() {
             statusText.style.opacity = 0;
-            
             finalCon.style.opacity = 1;
             finalCon.style.pointerEvents = 'auto';
 
-            const aiText = `命运的齿轮已经咬合。过去的【${state.selectedCards[0].name}】暗示了你潜意识的积淀，这直接导致了现在【${state.selectedCards[1].name}】的局面。而未来的【${state.selectedCards[2].name}】正在向你招手，只要你保持目前的觉知，答案自会显现。`;
+            // 检查 AI 结果
+            const aiTextElement = document.getElementById('ai-text');
             
-            typeWriter(aiText, document.getElementById('ai-text'));
+            if (state.aiSynthesis) {
+                // 如果 AI 已经算好了
+                typeWriter(state.aiSynthesis, aiTextElement);
+            } else {
+                // 如果网慢还没好，显示 Loading，轮询检查
+                aiTextElement.innerText = "正在接收来自深空的信号...";
+                const checkInterval = setInterval(() => {
+                    if (state.aiSynthesis) {
+                        clearInterval(checkInterval);
+                        typeWriter(state.aiSynthesis, aiTextElement);
+                    }
+                }, 500);
+            }
         }
 
         function typeWriter(text, element) {
