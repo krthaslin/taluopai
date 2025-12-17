@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DESTINY PROTOCOL V18 Refined</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --void-bg: #050505;
+            /* 电脑端 9:16 */
+            --card-w: 135px;
+            --card-h: 240px;
+            --gold: #d4af37; /* 暗金 */
+            --gold-dim: rgba(212, 175, 55, 0.5); /* 暗淡金 */
+            --neon: #9d00ff;
+        }
+
+        /* 手机端 9:16 */
+        @media (max-width: 768px) {
+            :root { --card-w: 90px; --card-h: 160px; }
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--void-bg);
+            color: white;
+            font-family: 'Noto Serif SC', serif; 
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%);
+            z-index: -1;
+            transition: opacity 1s;
+        }
+
+        .intro-layer {
+            position: absolute;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .crystal-ball {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(157, 0, 255, 0.5), #220033 90%);
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.4), inset -10px -10px 20px rgba(0,0,0,0.8);
+            position: relative;
+            margin-bottom: 40px;
+            animation: floatBall 6s ease-in-out infinite;
+        }
+        
+        @media (max-width: 768px) { .crystal-ball { width: 110px; height: 110px; margin-bottom: 30px; } }
+
+        .crystal-ball::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(255, 215, 0, 0.1) 60%, transparent 70%);
+            animation: pulseInner 3s infinite;
+        }
+
+        .input-group { position: relative; width: 280px; max-width: 80%; text-align: center; }
+
+        input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 30px;
+            color: var(--gold);
+            font-size: 16px;
+            padding: 15px 0;
+            text-align: center;
+            outline: none;
+            margin-bottom: 25px;
+            transition: 0.3s;
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+        }
+
+        button:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+
+        .vortex-container {
+            position: absolute;
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s;
+        }
+
+        .card-ring {
+            position: absolute;
+            width: 0; height: 0;
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: transform 2s ease-out;
+        }
+
+        .tarot-card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            left: calc(var(--card-w) / -2);
+            top: calc(var(--card-h) / -2);
+            border-radius: 8px;
+            transform-style: preserve-3d;
+            transition: transform 1s, opacity 1s;
+            cursor: default;
+            background-color: #222; 
+        }
+
+        .face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            overflow: hidden; 
+            transition: background-image 0.3s;
+        }
+
+        /* 背面：暗金网格 */
+        .face.back {
+            background-color: #111;
+            border: 1px solid #444;
+            background-image: 
+                linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%),
+                linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            z-index: 2;
+        }
+        /* 背面注入皮肤后：拉伸铺满 */
+        .face.back.has-skin {
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            border: none;
+        }
+
+        .face.front {
+            transform: rotateY(180deg);
+            z-index: 1;
+            background-color: #000;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* --- V18 排版重构 --- */
+        .content-overlay {
+            background: rgba(0, 0, 0, 0.85); 
+            width: 100%; height: 100%;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            /* 改为居中布局，通过 margin 调整间距 */
+            justify-content: center; 
+            align-items: center;
+            /* 增加留白：电脑端 24px */
+            padding: 24px; 
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.5s;
+            box-shadow: inset 0 0 0 1px var(--gold-dim);
+            outline: 1px solid rgba(212, 175, 55, 0.6);
+            outline-offset: -6px;
+        }
+        
+        .face.front.loaded .content-overlay { opacity: 1; }
+
+        /* 标题组容器，用于整体控制位置 */
+        .title-group {
+            margin-bottom: 20px; /* 与正文拉开距离 */
+            text-align: center;
+        }
+
+        /* 1. 古罗马数字优化：紧凑 */
+        .roman-num {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-dim);
+            font-size: 12px;
+            /* 关键：字间距归零，显得紧凑 */
+            letter-spacing: 0px; 
+            margin-bottom: 5px;
+        }
+
+        /* 中文主标题 */
+        .face.front h3 { 
+            margin: 0; 
+            color: var(--gold); 
+            font-size: 22px; 
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* 4. 新增：英文副标题 */
+        .sub-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-dim);
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase; /* 全大写 */
+            margin-top: 5px;
+            border-top: 1px solid var(--gold-dim); /* 放在英文上面做分割 */
+            padding-top: 5px;
+            display: inline-block; /* 让边框紧贴文字 */
+        }
+
+        /* 2. Emoji 已移除 */
+
+        /* 3. 正文排版优化：小字号，大行距 */
+        .face.front p { 
+            font-size: 10px; /* 电脑端字号调小 */
+            line-height: 2.0; /* 行距极大化，增加庄重感 */
+            color: #ddd; 
+            margin: 0; 
+            text-align: justify; /* 两端对齐 */
+            width: 100%;
+            font-weight: 300;
+        }
+
+        /* --- 移动端适配 (IMAX模式) --- */
+        @media (max-width: 768px) {
+            .content-overlay { padding: 18px; outline-offset: -4px; }
+            .title-group { margin-bottom: 15px; }
+            .roman-num { font-size: 8px; margin-bottom: 2px; }
+            .face.front h3 { font-size: 16px; letter-spacing: 1px; } 
+            .sub-title { font-size: 6px; margin-top: 2px; padding-top: 2px; }
+            /* 移动端极致小字号 */
+            .face.front p { font-size: 6px; line-height: 1.8; }
+        }
+
+        .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
+
+        .tarot-card.chosen {
+            pointer-events: auto;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2);
+            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s; 
+            z-index: 999;
+        }
+
+        .tarot-card.flipped {
+            z-index: 1000 !important;
+            box-shadow: 0 0 100px var(--neon);
+            transform: translate3d(0, 0, 400px) rotateY(180deg) scale(1.5) !important;
+        }
+
+        @media (max-width: 768px) {
+            .tarot-card.flipped { transform: translate3d(0, 0, 100px) rotateY(180deg) scale(3.2) !important; }
+        }
+
+        @keyframes floatBall { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-gradient" id="main-bg"></div>
+
+    <div class="intro-layer" id="intro-ui">
+        <div class="crystal-ball"></div>
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="输入所求之事..." autocomplete="off">
+            <button onclick="startRitual()">开启法阵</button>
+        </div>
+    </div>
+
+    <div class="vortex-container" id="vortex-con">
+        <div class="card-ring" id="card-ring"></div>
+    </div>
+
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('系统错误: ' + msg);
+            return false;
+        };
+
+        const cardRing = document.getElementById('card-ring');
+        const introUi = document.getElementById('intro-ui');
+        const mainBg = document.getElementById('main-bg');
+        
+        const isMobile = window.innerWidth < 768;
+        const TOTAL_CARDS = isMobile ? 12 : 24; 
+        
+        let allCards = [];
+        let pendingAiResult = null;
+        let isFetching = false;
+        let activeFlippedCard = null; 
+
+        // GitHub 图片链接
+        const SKINS = {
+            MOON: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png", 
+            STAR: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png", 
+            SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
+        };
+
+        // 兜底数据 (已更新为包含英文标题的结构)
+        const LOCAL_BACKUP = [
+            { id: "X", title: "命运之轮", enTitle: "THE WHEEL OF FORTUNE", desc: "巨大转机已至。这不是你能控制的，顺势而为，命运的齿轮开始转动。" },
+            { id: "IX", title: "隐士", enTitle: "THE HERMIT", desc: "答案不在外界喧嚣中。向内探索，独处与静默会为你带来真正的智慧。" },
+            { id: "XIX", title: "太阳", enTitle: "THE SUN", desc: "纯粹的生命力与喜悦。所有阴霾即将散去，真相与成功就在眼前。" },
+            { id: "XVIII", title: "月亮", enTitle: "THE MOON", desc: "潜意识深处的涌动。不安与幻象中蕴藏着真相，直觉比理智更准确。" }
+        ];
+
+        async function preFetchAiResult(query) {
+            isFetching = true;
+            try {
+                const response = await fetch('/api/tarot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                pendingAiResult = data;
+                if (activeFlippedCard) renderCardContent(activeFlippedCard, data);
+            } catch (e) {
+                console.log("Using Backup Data");
+                pendingAiResult = LOCAL_BACKUP[Math.floor(Math.random() * LOCAL_BACKUP.length)];
+                if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
+            } finally {
+                isFetching = false;
+            }
+        }
+
+        function startRitual() {
+            const query = document.getElementById('user-input').value;
+            if(!query) return alert("心诚则灵，请输入问题...");
+            introUi.classList.add('hidden');
+            preFetchAiResult(query);
+            generateVortex();
+        }
+
+        function generateVortex() {
+            const radius = isMobile ? 220 : 550; 
+            const zPush = isMobile ? -350 : 0; 
+            const yJitter = isMobile ? 180 : 300; 
+            
+            if(isMobile) {
+                cardRing.style.transform = `translateZ(${zPush}px)`;
+            }
+
+            for(let i=0; i<TOTAL_CARDS; i++) {
+                const card = document.createElement('div');
+                card.className = 'tarot-card';
+                card.innerHTML = `<div class="face back"></div><div class="face front"><div class="content-overlay"></div></div>`;
+
+                card.style.transform = `translate3d(0, 800px, -2000px)`; 
+                cardRing.appendChild(card);
+                allCards.push(card);
+
+                setTimeout(() => {
+                    const angle = (360 / TOTAL_CARDS) * i;
+                    const randomY = (Math.random() - 0.5) * yJitter; 
+                    card.style.opacity = 1;
+                    card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px) translateY(${randomY}px)`;
+                }, 100 + (i * 30));
+            }
+
+            setTimeout(performSelection, 3000);
+        }
+
+        function performSelection() {
+            const step = Math.floor(TOTAL_CARDS / 3);
+            const indices = [0, step, step * 2];
+            const chosenCards = indices.map(i => allCards[i]);
+
+            allCards.forEach((card, idx) => {
+                if(!indices.includes(idx)) card.classList.add('vanish');
+            });
+
+            chosenCards.forEach((card) => {
+                card.style.transition = 'transform 0.4s ease-in'; 
+                card.style.transform = `translate3d(0, 0, -2000px) rotateY(0deg)`;
+            });
+
+            setTimeout(() => {
+                chosenCards.forEach((card, i) => {
+                    const spread = isMobile ? 130 : 200;
+                    let xPos = 0; if(i === 0) xPos = -spread; if(i === 2) xPos = spread;
+                    card.offsetHeight; 
+                    card.className = 'tarot-card chosen'; 
+                    let rotY = 0; if(i === 0) rotY = 10; if(i === 2) rotY = -10;
+
+                    const yOffset = isMobile ? -50 : 0;
+                    const zPop = isMobile ? 120 : 200; 
+                    const baseScale = 1.0;
+
+                    card.style.transform = `translate3d(${xPos}px, ${yOffset}px, ${zPop}px) rotateY(${rotY}deg) scale(${baseScale})`;
+                    
+                    const backFace = card.querySelector('.face.back');
+                    const frontFace = card.querySelector('.face.front');
+                    let skinUrl = '';
+                    if (i === 0) skinUrl = SKINS.MOON;
+                    if (i === 1) skinUrl = SKINS.STAR;
+                    if (i === 2) skinUrl = SKINS.SUN;
+                    
+                    const img = new Image();
+                    img.onload = () => {
+                        backFace.classList.add('has-skin');
+                        backFace.style.backgroundImage = `url('${skinUrl}')`;
+                        frontFace.style.backgroundImage = `url('${skinUrl}')`;
+                    };
+                    img.src = skinUrl;
+
+                    card.onclick = () => revealContent(card);
+                });
+            }, 500); 
+        }
+
+        function renderCardContent(card, data) {
+            const overlay = card.querySelector('.content-overlay');
+            const frontFace = card.querySelector('.face.front');
+            
+            // 数据容错处理
+            const roman = data.id || "??";
+            const title = data.title || "未知牌面";
+            // 如果后端还没更新 enTitle，暂时显示占位符
+            const enTitle = data.enTitle || "UNKNOWN ARCANA";
+            const desc = data.desc || "迷雾重重，无法解读。";
+            
+            // 新的 HTML 结构：移除 Icon，增加 Title-Group 和 Sub-Title
+            overlay.innerHTML = `
+                <div class="title-group">
+                    <div class="roman-num">${roman}</div>
+                    <h3>${title}</h3>
+                    <div class="sub-title">${enTitle}</div>
+                </div>
+                <p>${desc}</p>
+            `;
+            frontFace.classList.add('loaded');
+        }
+
+        function revealContent(card) {
+            if(card.classList.contains('flipped')) return;
+            activeFlippedCard = card; 
+            mainBg.style.opacity = '0.3'; 
+            document.querySelectorAll('.chosen').forEach(c => {
+                if(c !== card) { c.style.opacity = 0; c.style.pointerEvents = 'none'; }
+            });
+
+            if (pendingAiResult) {
+                renderCardContent(card, pendingAiResult);
+            } else {
+                // Loading 状态也同步移除 Icon
+                const overlay = card.querySelector('.content-overlay');
+                const frontFace = card.querySelector('.face.front');
+                overlay.innerHTML = `
+                    <div class="title-group">
+                        <div class="roman-num">...</div>
+                        <h3>连接中</h3>
+                        <div class="sub-title">CONNECTING</div>
+                    </div>
+                    <p style="text-align:center">正在接收来自深空的信号...</p>
+                `;
+                frontFace.classList.add('loaded');
+            }
+            card.classList.add('flipped');
+        }
+    </script>
+</body>
+</html>
