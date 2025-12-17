@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { query } = req.body;
+  const { query, cards } = req.body; // 接收用户问题 + 前端抽好的3张牌
   const apiKey = process.env.DEEPSEEK_API_KEY;
 
   if (!apiKey) {
@@ -15,6 +15,10 @@ export default async function handler(req, res) {
 
   try {
     const startTime = Date.now();
+    
+    // 构建提示词：告诉 AI 牌已经抽好了，请解释
+    const cardText = cards.map(c => `${c.position}: ${c.name} (${c.keywords})`).join(", ");
+    
     const response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
@@ -23,27 +27,23 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        temperature: 1.1, // 保持 1.1，兼顾稳定与创意
+        temperature: 1.2, // 保持灵性
         messages: [
           {
             role: "system",
-            // ⭐️ 核心修改：以“API 接口”的身份要求 AI，比要求它做“塔罗师”更听话
-            content: `你是一个只输出 JSON 数据的后端 API。
-            用户会输入一个问题，你需要模拟塔罗师的口吻生成结果。
+            content: `你是一位高深莫测的塔罗师。用户已经抽取了三张牌（过去、现在、未来）。
             
-            严禁输出任何 Markdown 格式（如 \`\`\`json ）。
-            严禁输出任何开场白（如“好的”）。
-            只输出一个 JSON 对象，必须包含以下字段：
-            {
-              "id": "罗马数字(如 X)",
-              "title": "中文牌名",
-              "enTitle": "英文牌名(全大写)",
-              "desc": "50字以内的深邃中文解读"
-            }`
+            请根据牌面含义和流变关系，结合用户的问题，给出一场**连贯、富有洞察力**的最终解读。
+            
+            要求：
+            1. 不要机械地一张张解释，而是将三者串联成一个故事或指引。
+            2. 语气神秘、优雅、直击人心。
+            3. 字数控制在 100 字以内。
+            4. 必须返回纯净 JSON 格式：{"analysis": "你的解读内容..."}`
           },
           {
             role: "user",
-            content: query
+            content: `用户疑惑：${query}\n牌阵结果：${cardText}`
           }
         ],
         response_format: { type: "json_object" }
@@ -57,32 +57,14 @@ export default async function handler(req, res) {
     const data = await response.json();
     const rawContent = data.choices[0].message.content;
     
-    // --- 🛡️ 容错提取升级：正则暴力匹配 ---
-    // 即使 AI 加了废话，这段正则也能精准抠出最外层的 {}
+    // 简单的 JSON 提取
     const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("无有效 JSON");
     
-    if (!jsonMatch) {
-        throw new Error("AI 返回内容不包含有效的 JSON 对象");
-    }
-
-    const cleanContent = jsonMatch[0];
-    let parsedData;
-    
-    try {
-        parsedData = JSON.parse(cleanContent);
-    } catch (e) {
-        throw new Error("JSON 语法错误，无法解析");
-    }
-
-    // --- 🛡️ 字段安检：缺啥补啥，防止前端 undefined ---
-    if (!parsedData.id) parsedData.id = "XXII"; // 兜底编号
-    if (!parsedData.title) parsedData.title = "迷雾"; // 兜底标题
-    if (!parsedData.enTitle) parsedData.enTitle = "THE UNKNOWN";
-    if (!parsedData.desc) parsedData.desc = "命运的启示模糊不清，请用心感受。";
+    const parsedData = JSON.parse(jsonMatch[0]);
 
     res.status(200).json({
         result: parsedData,
-        debug_raw: rawContent, 
         time_ms: Date.now() - startTime
     });
 
