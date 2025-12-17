@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.2 FINAL POLISH</title>
+    <title>DESTINY PROTOCOL V4.3 SPIRIT</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,24 +39,23 @@
             z-index: -1;
         }
 
-        /* --- 舞台区 (修改点 1：权重加大到 70%，腾出垂直空间) --- */
+        /* --- 舞台区 --- */
         .stage-area {
-            flex: 70; /* 之前是 60 */
+            flex: 70; 
             width: 100%;
             display: flex; flex-direction: column;
-            justify-content: center; /* 垂直居中，但因为flex大，实际视觉中心会下移 */
+            justify-content: center; 
             align-items: center;
             position: relative; z-index: 10;
         }
 
-        /* 魔法阵 (修改点 2：利用 top% 将其整体下压) */
+        /* 魔法阵 */
         .magic-circle-container {
             position: absolute; 
             width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 20;
             transition: all 0.8s ease;
-            /* 从 45% 改为 55%，显著下移 */
             top: 55%; 
             transform: translateY(-50%);
         }
@@ -89,10 +88,12 @@
             animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风 */
+        /* 龙卷风 (修改点 1：位置下移) */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%;
-            top: 0; left: 0; pointer-events: none;
+            /* 增加 top 偏移，让中心点下沉 */
+            top: 15%; 
+            left: 0; pointer-events: none;
             transform-style: preserve-3d;
             display: flex; justify-content: center; align-items: center;
             z-index: 15;
@@ -107,11 +108,10 @@
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
-        /* 牌堆 (跟随法阵下移) */
+        /* 牌堆 */
         .deck-stack {
             position: absolute; width: 80px; height: 140px;
-            /* 之前是 60%，现在稍微上提一点点以配合新布局，或者保持 60% */
-            top: 55%; /* 与法阵中心对齐 */
+            top: 55%; 
             left: 50%; margin-left: -40px; margin-top: -70px;
             z-index: 25; pointer-events: none; opacity: 0; 
             transition: opacity 1.5s ease-in;
@@ -123,10 +123,9 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* 输入区 (修改点 3：拉大间距) */
+        /* 输入区 */
         .controls-wrapper {
             position: absolute; 
-            /* 从 55% 改为 70%，把输入框用力往下推 */
             top: 72%; 
             width: 100%; display: flex; flex-direction: column; align-items: center;
             transition: all 0.5s ease;
@@ -159,7 +158,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* --- 区域 2: 卡槽 (缩小权重至 30%，给上面腾地方) --- */
+        /* 卡槽区 */
         .slots-container {
             flex: 30; width: 100%;
             display: flex; justify-content: space-evenly; align-items: flex-start;
@@ -177,7 +176,7 @@
             color: #444; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
         }
 
-        /* --- 动态元素 --- */
+        /* 动画元素 */
         .flying-card {
             position: fixed; width: var(--card-w-mobile); height: var(--card-h-mobile);
             border-radius: 6px; transform-style: preserve-3d;
@@ -198,11 +197,10 @@
             box-shadow: inset 0 0 0 1px var(--gold-dim);
         }
         
-        /* (修改点 4：圆角设为 2px) */
         .front-content {
             padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
             border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px);
-            border-radius: 0 0 2px 2px; /* 极小圆角 */
+            border-radius: 0 0 2px 2px; 
         }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
@@ -265,16 +263,12 @@
     </div>
 
     <script>
-        // 核心修复：锁定高度，防止键盘顶起
         function lockViewportHeight() {
             document.body.style.height = window.innerHeight + 'px';
         }
         window.addEventListener('load', lockViewportHeight);
-        window.addEventListener('resize', () => {
-             // 可选：处理严重的屏幕旋转等情况
-        });
 
-        // 完整数据
+        // (修改点 3：恋人图片修复)
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
@@ -282,7 +276,7 @@
             { id: "III", name: "女皇", en: "The Empress", keywords: "丰饶 · 母性 · 自然", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
             { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 控制", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
             { id: "V", name: "教皇", en: "The Hierophant", keywords: "传统 · 信仰 · 学习", img: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
-            { id: "VI", name: "恋人", en: "The Lovers", keywords: "关系 · 选择 · 和谐", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg" },
+            { id: "VI", name: "恋人", en: "The Lovers", keywords: "关系 · 选择 · 和谐", img: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_06_Lovers.jpg" },
             { id: "VII", name: "战车", en: "The Chariot", keywords: "行动 · 胜利 · 意志力", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
             { id: "VIII", name: "力量", en: "Strength", keywords: "勇气 · 耐心 · 同情", img: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
             { id: "IX", name: "隐士", en: "The Hermit", keywords: "内省 · 孤独 · 指引", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
@@ -363,12 +357,14 @@
                 card.className = 'storm-card';
                 tornadoCon.appendChild(card);
                 
+                // 随机初始参数
                 const t = {
                     el: card,
                     angle: (i / 36) * 360,
                     y: (Math.random() - 0.5) * 600,
                     radius: 120 + Math.random() * 150,
-                    speed: 2 + Math.random() * 3
+                    baseSpeed: 2 + Math.random() * 3, // 基础速度
+                    speed: 0
                 };
                 state.tornadoCards.push(t);
                 
@@ -377,10 +373,19 @@
             animateTornado();
         }
 
+        // (修改点 2：变速呼吸律动)
         function animateTornado() {
             if (!state.shuffling) return;
+            
+            // 使用正弦波模拟呼吸律动 (0.5x ~ 1.5x)
+            const time = Date.now() / 1000;
+            const wave = Math.sin(time * 2); // 2是频率
+            const speedMultiplier = 1 + (wave * 0.5); 
+
             state.tornadoCards.forEach(t => {
-                t.angle += t.speed;
+                // 动态调整速度
+                const currentSpeed = t.baseSpeed * speedMultiplier;
+                t.angle += currentSpeed;
                 t.el.style.transform = `translateY(${t.y}px) rotateY(${t.angle}deg) translateZ(${t.radius}px)`;
             });
             state.animationFrame = requestAnimationFrame(animateTornado);
