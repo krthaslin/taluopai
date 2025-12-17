@@ -3,42 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V22 FIXED</title>
+    <title>DESTINY PROTOCOL V23 STABLE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 1. 基础重置 */
+        /* 1. 基础设置 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #050505; }
-        
-        :root {
-            /* 电脑端基准 */
-            --card-w: 135px;
-            --card-h: 240px;
-            --gold: #d4af37;
-            --gold-dim: rgba(212, 175, 55, 0.6);
-            --neon: #9d00ff;
-        }
-
-        /* 手机端基准 */
-        @media (max-width: 768px) {
-            :root { --card-w: 110px; --card-h: 195px; }
-        }
-
-        body {
+        /* 强制禁止字体膨胀 */
+        html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+        body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
+            background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; justify-content: center; align-items: center;
             perspective: 1000px;
         }
 
-        .bg-gradient {
-            position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%);
-            z-index: -1;
+        :root {
+            --card-w: 135px; --card-h: 240px; /* 电脑端 */
+            --gold: #d4af37; --gold-dim: rgba(212, 175, 55, 0.6); --neon: #9d00ff;
         }
+
+        /* 手机端尺寸：保持 V20 的稍微加大版，比较有分量 */
+        @media (max-width: 768px) {
+            :root { --card-w: 110px; --card-h: 195px; }
+        }
+
+        .bg-gradient { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%); z-index: -1; }
 
         /* UI层 */
         .intro-layer { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; width: 100%; transition: opacity 0.8s; }
@@ -51,12 +45,10 @@
         .card-ring { position: absolute; transform-style: preserve-3d; transition: transform 2s ease-out; }
 
         .tarot-card {
-            position: absolute;
-            width: var(--card-w); height: var(--card-h);
+            position: absolute; width: var(--card-w); height: var(--card-h);
             left: calc(var(--card-w) / -2); top: calc(var(--card-h) / -2);
             border-radius: 8px; transform-style: preserve-3d;
-            transition: transform 1s, opacity 1s;
-            background-color: #222;
+            transition: transform 1s, opacity 1s; background-color: #222;
         }
 
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; overflow: hidden; transition: background-image 0.3s; }
@@ -64,102 +56,93 @@
         .face.back.has-skin { background-size: cover !important; background-repeat: no-repeat !important; border: none; }
         .face.front { transform: rotateY(180deg); background-color: #000; background-size: cover; background-position: center; }
 
-        /* --- 核心修复：逆向缩放排版系统 (Inverse Scaling) --- */
+        /* --- 核心修复：回归稳健排版 --- */
         .content-overlay {
             background: rgba(0, 0, 0, 0.85); width: 100%; height: 100%;
             opacity: 0; transition: opacity 0.5s;
             box-shadow: inset 0 0 0 1px var(--gold-dim); outline: 1px solid rgba(212, 175, 55, 0.6);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+            /* 简单的 Flex 居中 */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            /* 电脑端内边距 */
+            padding: 20px;
         }
         .face.front.loaded .content-overlay { opacity: 1; }
 
-        /* Typo-Scaler: 字体缩放容器 
-           原理：我们把容器放大到 3倍 (280%)，然后用 CSS 缩小回去。
-           这样里面的字可以写成 24px+，彻底绕过手机浏览器 "最小字体12px" 的强制限制。
-           结果：文字会变得极其清晰、精致，不再有"巨大字"的问题。
-        */
-        .typo-scaler {
-            width: 280%; 
-            height: 280%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transform: scale(0.35); /* 核心魔法：缩小显示 */
-            transform-origin: center center;
-            padding: 20px; text-align: center;
+        /* 电脑端字体 */
+        .title-group { text-align: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid var(--gold-dim); padding-bottom: 10px; }
+        .roman-num { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 10px; display: block; margin-bottom: 5px; }
+        .main-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 2px; white-space: nowrap; }
+        .sub-title { font-family: 'Cinzel', serif; color: #888; font-size: 8px; margin-top: 5px; display: block; letter-spacing: 1px; }
+        .desc-text { color: #ddd; font-size: 10px; line-height: 1.8; text-align: justify; margin: 0; }
+
+        /* --- 手机端特别优化 (NO SCALING TRICKS) --- */
+        @media (max-width: 768px) {
+            .content-overlay { 
+                padding: 10px; /* 极窄边距，给文字腾地方 */
+                outline-offset: -4px; 
+            }
+
+            .title-group {
+                margin-bottom: 8px;
+                padding-bottom: 5px;
+                border-bottom-width: 0.5px;
+            }
+
+            /* 使用浏览器通常能接受的最小字号 9px-12px */
+            .roman-num { font-size: 9px; margin-bottom: 2px; opacity: 0.8; }
+
+            .main-title { 
+                font-size: 16px; /* 足够大，不会被强制放大 */
+                letter-spacing: 1px; /* 收紧一点 */
+                margin: 2px 0;
+            }
+
+            .sub-title {
+                font-size: 8px; /* 如果浏览器强行显示12px，这里用 scale 单独缩放这一行 */
+                transform: scale(0.8); 
+                margin-top: 2px;
+            }
+
+            .desc-text {
+                font-size: 10px; /* 设定为 10px */
+                line-height: 1.4; /* 紧凑行高 */
+                color: #ececec;
+                /* 如果内容太多，允许滚动，防止炸开 */
+                max-height: 90px;
+                overflow-y: auto;
+                /* 隐藏滚动条 */
+                scrollbar-width: none; 
+            }
+            .desc-text::-webkit-scrollbar { display: none; }
         }
 
-        .title-group { 
-            margin-bottom: 40px; 
-            width: 100%; 
-            border-bottom: 2px solid var(--gold-dim); 
-            padding-bottom: 20px;
-        }
-
-        /* 这里的字号写得很大，但因为被缩小了，显示出来很小很精致 */
-        .roman-num { 
-            font-family: 'Cinzel', serif; 
-            color: var(--gold-dim); 
-            font-size: 28px; 
-            display: block; 
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        .main-title { 
-            color: var(--gold); 
-            font-size: 58px; 
-            font-weight: 700; 
-            margin: 0; 
-            letter-spacing: 12px; 
-            line-height: 1.2;
-        }
-
-        .sub-title { 
-            font-family: 'Cinzel', serif; 
-            color: #888; 
-            font-size: 20px; 
-            margin-top: 15px; 
-            display: block; 
-            letter-spacing: 4px; 
-            text-transform: uppercase;
-        }
-
-        .desc-text { 
-            color: #ececec; 
-            font-size: 32px; /* 字号够大，浏览器不会乱动 */
-            line-height: 1.8; 
-            text-align: justify; 
-            margin: 0; 
-            font-weight: 300;
-            padding: 0 10px;
-        }
-
-        /* --- 动画 --- */
+        /* 动画 */
         .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
         .tarot-card.chosen { pointer-events: auto; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s; z-index: 999; }
+        
         .tarot-card.flipped { z-index: 1000 !important; box-shadow: 0 0 100px var(--neon); transform: translate3d(0, 0, 400px) rotateY(180deg) scale(1.5) !important; }
         @media (max-width: 768px) {
+            /* 手机端：倍率 2.6，距离 220px */
             .tarot-card.flipped { transform: translate3d(0, 0, 220px) rotateY(180deg) scale(2.6) !important; }
         }
         @keyframes floatBall { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
-        /* --- 屏幕显形调试条 --- */
+        /* 调试条 */
         #live-debug {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(0, 30, 0, 0.9); color: #00ff00;
-            font-family: monospace; font-size: 10px;
+            background: rgba(0, 30, 0, 0.95); color: #00ff00;
+            font-family: monospace; font-size: 10px; line-height: 1.4;
             padding: 8px; z-index: 99999; text-align: left;
             border-bottom: 1px solid #00ff00;
             display: none; white-space: pre-wrap; word-break: break-all;
-            max-height: 100px; overflow-y: scroll;
+            max-height: 120px; overflow-y: scroll;
         }
     </style>
 </head>
 <body>
 
-    <div id="live-debug">等待连接...</div>
-    
+    <div id="live-debug">Waiting...</div>
     <div class="bg-gradient" id="main-bg"></div>
 
     <div class="intro-layer" id="intro-ui">
@@ -175,11 +158,10 @@
     </div>
 
     <script>
-        // 显形调试函数
         function logToScreen(msg, isError = false) {
             const el = document.getElementById('live-debug');
             el.style.display = 'block';
-            el.style.backgroundColor = isError ? 'rgba(50, 0, 0, 0.9)' : 'rgba(0, 30, 0, 0.9)';
+            el.style.backgroundColor = isError ? 'rgba(50, 0, 0, 0.95)' : 'rgba(0, 30, 0, 0.95)';
             el.style.color = isError ? '#ff4444' : '#00ff00';
             const time = new Date().toLocaleTimeString();
             el.innerText = `[${time}] ${msg}`;
@@ -203,7 +185,7 @@
         };
 
         async function preFetchAiResult(query) {
-            logToScreen("正在发送信号到深空(Vercel)...");
+            logToScreen("正在连接深空 API...");
             try {
                 const response = await fetch('/api/tarot', {
                     method: 'POST',
@@ -212,19 +194,17 @@
                 });
                 
                 if (response.status !== 200) {
-                    throw new Error(`HTTP Error ${response.status}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const jsonResp = await response.json();
 
-                // 优先展示 debug_raw 信息 (如果后端传了)
                 if (jsonResp.debug_raw) {
-                    logToScreen("【AI原始回复】\n" + jsonResp.debug_raw.substring(0, 100) + "...");
+                    logToScreen("【AI原始回复】\n" + jsonResp.debug_raw);
                 } else if (jsonResp.title) {
-                     logToScreen("【成功】接收到牌: " + jsonResp.title);
+                     logToScreen("【成功】牌名: " + jsonResp.title);
                 }
 
-                // 兼容两种返回格式
                 const finalData = jsonResp.result || jsonResp; 
                 pendingAiResult = finalData; 
 
@@ -233,10 +213,10 @@
                 }
 
             } catch (e) {
-                logToScreen("连接断开: " + e.message, true);
+                logToScreen("错误: " + e.message, true);
                 pendingAiResult = {
                     id: "ERR", title: "信号丢失", enTitle: "SIGNAL LOST",
-                    desc: "无法连接到主脑。请检查网络。\n" + e.message
+                    desc: "无法连接到主脑。\n" + e.message
                 };
                 if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
             }
@@ -322,14 +302,12 @@
             const desc = data.desc || "......";
 
             overlay.innerHTML = `
-                <div class="typo-scaler">
-                    <div class="title-group">
-                        <span class="roman-num">${roman}</span>
-                        <h3 class="main-title">${title}</h3>
-                        <span class="sub-title">${enTitle}</span>
-                    </div>
-                    <p class="desc-text">${desc}</p>
+                <div class="title-group">
+                    <span class="roman-num">${roman}</span>
+                    <h3 class="main-title">${title}</h3>
+                    <span class="sub-title">${enTitle}</span>
                 </div>
+                <p class="desc-text">${desc}</p>
             `;
             frontFace.classList.add('loaded');
         }
@@ -346,14 +324,12 @@
                 const overlay = card.querySelector('.content-overlay');
                 const frontFace = card.querySelector('.face.front');
                 overlay.innerHTML = `
-                    <div class="typo-scaler">
-                        <div class="title-group">
-                            <span class="roman-num">...</span>
-                            <h3 class="main-title">连接中</h3>
-                            <span class="sub-title">CONNECTING</span>
-                        </div>
-                        <p class="desc-text">正在从深空接收信号...</p>
+                    <div class="title-group">
+                        <span class="roman-num">...</span>
+                        <h3 class="main-title">连接中</h3>
+                        <span class="sub-title">CONNECTING</span>
                     </div>
+                    <p class="desc-text" style="text-align:center">正在建立量子链接...</p>
                 `;
                 frontFace.classList.add('loaded');
             }
