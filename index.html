@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V3.3 TORNADO</title>
+    <title>DESTINY PROTOCOL V3.4 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
             overflow: hidden; background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
-            perspective: 1000px; /* 3D 景深 */
+            perspective: 1200px; /* 加深景深 */
         }
 
         :root {
@@ -35,24 +35,23 @@
             z-index: -1;
         }
 
-        /* --- 区域 1: 舞台中心 (Flex 调整为 55%，视觉更居中) --- */
+        /* --- 区域 1: 舞台中心 --- */
         .stage-area {
-            flex: 55; width: 100%;
+            flex: 60; width: 100%;
             display: flex; flex-direction: column;
-            justify-content: flex-end; /* 靠下对齐，接近物理中心 */
+            justify-content: flex-end;
             align-items: center;
             position: relative; z-index: 10;
             padding-bottom: 40px;
         }
 
-        /* 魔法阵 (交互核心) */
+        /* 魔法阵 */
         .magic-circle-container {
             position: relative;
-            width: 180px; height: 180px;
+            width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; /* 提示可点击 */
-            -webkit-user-select: none; user-select: none;
-            transition: transform 0.2s;
+            cursor: pointer; z-index: 20;
+            transition: transform 0.3s, opacity 0.5s;
         }
         .magic-circle-container:active { transform: scale(0.95); }
 
@@ -63,11 +62,10 @@
             background: radial-gradient(circle, transparent 60%, rgba(157, 0, 255, 0.2));
             transition: all 0.5s;
         }
-        /* 激活状态：法阵狂暴 */
         .magic-circle.active {
             box-shadow: 0 0 80px var(--neon), inset 0 0 50px var(--neon);
             border-color: #fff;
-            animation: rotateFast 1s linear infinite; 
+            animation: rotateFast 0.5s linear infinite; /* 极速旋转 */
         }
         
         .magic-circle::before {
@@ -77,7 +75,6 @@
             animation: rotateSlow 12s linear infinite reverse;
         }
 
-        /* 中心的提示文字 (代替按钮) */
         .circle-hint {
             position: absolute; color: var(--gold); font-size: 14px; font-weight: bold;
             text-align: center; pointer-events: none; letter-spacing: 2px;
@@ -85,24 +82,44 @@
             animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风容器 */
+        /* 龙卷风容器 (V18 复刻版) */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%;
             top: 0; left: 0; pointer-events: none;
             transform-style: preserve-3d;
             display: flex; justify-content: center; align-items: center;
+            z-index: 15;
         }
-        /* 龙卷风中的单张卡片 */
+        
         .storm-card {
-            position: absolute; width: 40px; height: 60px;
-            background: #222; border: 1px solid var(--gold-dim); border-radius: 3px;
-            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
-            background-size: 8px 8px;
-            opacity: 0; /* 初始不可见 */
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; width: 60px; height: 100px; /* 更大的卡片 */
+            background: #111; border: 1px solid var(--gold); border-radius: 4px;
+            /* 金色网格背纹 */
+            background-image: linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%), 
+                              linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 5px 5px;
+            box-shadow: 0 0 15px rgba(157, 0, 255, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.1s; /* 极速响应 */
         }
 
-        /* 输入框 (紧贴法阵下方) */
+        /* 悬浮牌堆 (松手后出现) */
+        .deck-stack {
+            position: absolute; width: 80px; height: 140px;
+            top: 50%; left: 50%; transform: translate(-50%, -80%); /* 稍微靠上 */
+            transform-style: preserve-3d; cursor: pointer;
+            z-index: 25; pointer-events: none; opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .deck-card-static {
+            position: absolute; width: 100%; height: 100%;
+            background: #111; border: 1px solid var(--gold-dim); border-radius: 6px;
+            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
+            background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* 输入框 */
         .input-box {
             margin-top: 40px; width: 260px;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
@@ -110,18 +127,17 @@
             font-family: 'Noto Serif SC', serif; transition: opacity 0.5s;
         }
 
-        /* 辅助提示语 */
         .status-text {
             margin-top: 15px; height: 20px;
             color: #888; font-size: 12px; letter-spacing: 1px;
             transition: opacity 0.3s;
         }
 
-        /* --- 区域 2: 底部卡槽 (Flex 45%) --- */
+        /* --- 区域 2: 底部卡槽 --- */
         .slots-container {
-            flex: 45; width: 100%;
+            flex: 40; width: 100%;
             display: flex; justify-content: space-evenly; align-items: flex-start;
-            padding-top: 20px;
+            padding-top: 10px;
             opacity: 0; pointer-events: none; transition: opacity 1s;
         }
         .slot {
@@ -135,7 +151,7 @@
             color: #444; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
         }
 
-        /* --- 飞行动画与卡片样式 --- */
+        /* --- 动态元素 --- */
         .flying-card {
             position: fixed; width: var(--card-w-mobile); height: var(--card-h-mobile);
             border-radius: 6px; transform-style: preserve-3d;
@@ -145,7 +161,7 @@
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; overflow: hidden; }
         
         .back { background-color: #111; background-size: cover; background-position: center; border: 1px solid #444; }
-        /* 纹理皮肤 */
+        .back.default { background-image: linear-gradient(45deg, #222 25%, #111 25%), linear-gradient(-45deg, #222 25%, #111 25%); background-size: 4px 4px; }
         .back.moon { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png'); }
         .back.star { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png'); }
         .back.sun  { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png'); }
@@ -162,7 +178,6 @@
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
 
-        /* 聚焦遮罩 */
         .overlay-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 90;
@@ -178,7 +193,6 @@
         .flying-card.zoomed .card-name { font-size: 24px; margin-bottom: 10px; }
         .flying-card.zoomed .card-keywords { font-size: 14px; color: #fff; transform: scale(1); white-space: normal; }
 
-        /* 解读面板 */
         .synthesis-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, #000 90%, transparent);
@@ -200,12 +214,18 @@
     <div class="overlay-mask" id="mask"></div>
 
     <div class="stage-area">
-        
         <div class="tornado-wrapper" id="tornado-con"></div>
 
         <div class="magic-circle-container" id="magic-trigger">
             <div class="magic-circle" id="magic-ring"></div>
             <div class="circle-hint" id="circle-text">长按<br>注入能量</div>
+        </div>
+
+        <div class="deck-stack" id="deck-stack">
+            <div class="deck-card-static" style="transform: translateZ(0px)"></div>
+            <div class="deck-card-static" style="transform: translateZ(2px) rotate(2deg)"></div>
+            <div class="deck-card-static" style="transform: translateZ(4px) rotate(-1deg)"></div>
+            <div class="deck-card-static" style="transform: translateZ(6px) rotate(1deg)"></div>
         </div>
 
         <input type="text" class="input-box" id="user-input" placeholder="输入所求之事..." autocomplete="off">
@@ -224,18 +244,30 @@
     </div>
 
     <script>
-        // --- 1. 数据 ---
+        // --- 1. 完整大阿卡纳数据 (22张) ---
         const TAROT_DATA = [
-            { id: "0", name: "愚者", en: "The Fool", keywords: "起点 · 自由 · 潜力", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
-            { id: "I", name: "魔术师", en: "The Magician", keywords: "创造 · 力量 · 专注", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
+            { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
+            { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
             { id: "II", name: "女祭司", en: "The High Priestess", keywords: "直觉 · 神秘 · 潜意识", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
             { id: "III", name: "女皇", en: "The Empress", keywords: "丰饶 · 母性 · 自然", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
-            { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 稳固", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
+            { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 控制", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
+            { id: "V", name: "教皇", en: "The Hierophant", keywords: "传统 · 信仰 · 学习", img: "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg" },
+            { id: "VI", name: "恋人", en: "The Lovers", keywords: "关系 · 选择 · 和谐", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg" },
+            { id: "VII", name: "战车", en: "The Chariot", keywords: "行动 · 胜利 · 意志力", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
+            { id: "VIII", name: "力量", en: "Strength", keywords: "勇气 · 耐心 · 同情", img: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
             { id: "IX", name: "隐士", en: "The Hermit", keywords: "内省 · 孤独 · 指引", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
             { id: "X", name: "命运之轮", en: "Wheel of Fortune", keywords: "流转 · 机遇 · 宿命", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
+            { id: "XI", name: "正义", en: "Justice", keywords: "公平 · 真理 · 因果", img: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
             { id: "XII", name: "倒吊人", en: "The Hanged Man", keywords: "牺牲 · 等待 · 新视角", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
             { id: "XIII", name: "死神", en: "Death", keywords: "结束 · 转变 · 重生", img: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
-            { id: "XIX", name: "太阳", en: "The Sun", keywords: "成功 · 喜悦 · 活力", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" }
+            { id: "XIV", name: "节制", en: "Temperance", keywords: "平衡 · 治愈 · 融合", img: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
+            { id: "XV", name: "恶魔", en: "The Devil", keywords: "束缚 · 欲望 · 物质", img: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
+            { id: "XVI", name: "高塔", en: "The Tower", keywords: "崩塌 · 启示 · 突变", img: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
+            { id: "XVII", name: "星星", en: "The Star", keywords: "希望 · 灵感 · 宁静", img: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
+            { id: "XVIII", name: "月亮", en: "The Moon", keywords: "幻觉 · 不安 · 潜意识", img: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
+            { id: "XIX", name: "太阳", en: "The Sun", keywords: "成功 · 喜悦 · 活力", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
+            { id: "XX", name: "审判", en: "Judgement", keywords: "觉醒 · 召唤 · 新生", img: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
+            { id: "XXI", name: "世界", en: "The World", keywords: "圆满 · 完成 · 旅程", img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
         ];
 
         let state = {
@@ -244,31 +276,27 @@
             selectedCards: [],
             currentSlot: 0,
             cardsRevealed: 0,
-            tornadoCards: [] // 存储龙卷风里的DOM元素
+            tornadoCards: [],
+            animationFrame: null,
+            tornadoAngle: 0
         };
 
-        // DOM 元素
         const trigger = document.getElementById('magic-trigger');
         const ring = document.getElementById('magic-ring');
         const circleText = document.getElementById('circle-text');
         const tornadoCon = document.getElementById('tornado-con');
         const inputBox = document.getElementById('user-input');
         const statusText = document.getElementById('status-text');
+        const deckStack = document.getElementById('deck-stack');
 
-        // --- 2. 交互事件绑定 ---
-        // 支持鼠标和触摸
         trigger.addEventListener('mousedown', startChanneling);
         trigger.addEventListener('touchstart', (e) => { e.preventDefault(); startChanneling(); });
         
         trigger.addEventListener('mouseup', stopChanneling);
-        trigger.addEventListener('mouseleave', stopChanneling);
         trigger.addEventListener('touchend', stopChanneling);
 
-        // --- 3. 核心逻辑 ---
-
         function startChanneling() {
-            if (state.destinyLocked) return; // 锁定后不能再洗牌
-            
+            if (state.destinyLocked) return;
             const query = inputBox.value;
             if (!query) {
                 statusText.innerText = "请先输入心中的疑惑...";
@@ -280,94 +308,101 @@
             ring.classList.add('active');
             circleText.innerText = "能量注入中...";
             statusText.innerText = "";
-            
-            createTornado(); // 召唤龙卷风
+            createTornado();
         }
 
         function stopChanneling() {
             if (!state.shuffling) return;
-            
             state.shuffling = false;
             ring.classList.remove('active');
-            
-            // 锁定命运
-            lockDestiny();
-            
-            // 收回龙卷风
-            destroyTornado();
+            cancelAnimationFrame(state.animationFrame); // 停止龙卷风计算
 
-            // UI 变更
-            circleText.innerText = ""; // 清空中间文字
-            inputBox.style.opacity = 0; // 隐藏输入框
-            inputBox.blur();
-            
-            statusText.style.color = "#888";
-            statusText.innerText = "命运已定。请依次点击法阵，抽取过去、现在、未来。";
-            
-            // 改变法阵点击行为 -> 变成抽牌
-            trigger.onclick = distributeCard;
-            // 移除长按监听
-            trigger.removeEventListener('mousedown', startChanneling);
-            trigger.removeEventListener('touchstart', startChanneling);
+            lockDestiny(); // 锁定数据
+            destroyTornado(); // 收回牌
         }
 
-        // --- 龙卷风特效逻辑 ---
+        // --- 核心：V18 复刻版龙卷风逻辑 ---
         function createTornado() {
-            // 清空旧的
             tornadoCon.innerHTML = '';
             state.tornadoCards = [];
-
-            // 生成 24 张小牌
-            for (let i = 0; i < 24; i++) {
+            
+            // 生成 36 张卡片，构成庞大漩涡
+            for (let i = 0; i < 36; i++) {
                 const card = document.createElement('div');
                 card.className = 'storm-card';
                 tornadoCon.appendChild(card);
-                state.tornadoCards.push(card);
-
-                // 随机参数
-                const delay = Math.random() * 0.5;
-                const angle = (i / 24) * 360 + Math.random() * 30; // 环形分布
-                const height = (Math.random() - 0.5) * 200; // 高度分布
-                const radius = 100 + Math.random() * 50; // 半径
-
-                // 强制重绘
-                card.offsetHeight;
-
-                // 激活飞出动画 (CSS Transition)
-                setTimeout(() => {
-                    card.style.opacity = 0.8;
-                    // 使用 transform 组合：旋转角度 + 撑开半径 + 垂直高度
-                    card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px) translateY(${height}px)`;
-                }, delay * 100);
+                
+                // 随机分布参数
+                const t = {
+                    el: card,
+                    angle: (i / 36) * 360,
+                    y: (Math.random() - 0.5) * 600, // 高度拉开
+                    radius: 120 + Math.random() * 150, // 半径拉大
+                    speed: 2 + Math.random() * 3 // 旋转速度
+                };
+                state.tornadoCards.push(t);
+                
+                // 出现动画
+                setTimeout(() => { card.style.opacity = 0.8; }, Math.random() * 200);
             }
+            animateTornado();
+        }
+
+        function animateTornado() {
+            if (!state.shuffling) return;
+            
+            state.tornadoCards.forEach(t => {
+                t.angle += t.speed; // 持续旋转
+                t.el.style.transform = `translateY(${t.y}px) rotateY(${t.angle}deg) translateZ(${t.radius}px)`;
+            });
+            state.animationFrame = requestAnimationFrame(animateTornado);
         }
 
         function destroyTornado() {
-            // 所有卡片吸回中心
-            state.tornadoCards.forEach((card, i) => {
-                setTimeout(() => {
-                    card.style.transform = `rotateY(0deg) translateZ(0px) translateY(0px) scale(0.1)`;
-                    card.style.opacity = 0;
-                }, i * 20); // 错落收回
+            // 所有卡片飞回中心点 (吸入效果)
+            state.tornadoCards.forEach((t, i) => {
+                t.el.style.transition = 'all 0.6s ease-in';
+                t.el.style.transform = `translateY(0px) rotateY(${t.angle + 180}deg) translateZ(0px) scale(0.1)`;
+                t.el.style.opacity = 0;
             });
 
-            // 1秒后清理 DOM
+            // 延迟显示牌堆
             setTimeout(() => {
-                tornadoCon.innerHTML = '';
-            }, 1500);
+                tornadoCon.innerHTML = ''; // 清理龙卷风DOM
+                showDeckStack(); // 显示整齐牌堆
+            }, 600);
         }
 
-        // 锁定数据
+        function showDeckStack() {
+            // UI 状态切换
+            circleText.innerText = "";
+            trigger.style.opacity = 0; // 隐藏法阵，为了不遮挡牌堆
+            trigger.style.pointerEvents = 'none';
+            
+            inputBox.style.opacity = 0;
+            inputBox.blur();
+
+            // 显示牌堆
+            deckStack.style.opacity = 1;
+            
+            // 延时允许点击 (交互节奏)
+            setTimeout(() => {
+                deckStack.style.pointerEvents = 'auto'; // 允许点击
+                deckStack.onclick = distributeCard;     // 绑定发牌
+                
+                statusText.style.color = "#888";
+                statusText.innerText = "命运已定。请依次点击牌堆，抽取过去、现在、未来。";
+                statusText.style.opacity = 1;
+            }, 500);
+        }
+
         function lockDestiny() {
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
             state.selectedCards = [shuffled[0], shuffled[1], shuffled[2]];
             state.destinyLocked = true;
-            
-            // 显示空卡槽
             document.getElementById('slots-area').style.opacity = 1;
         }
 
-        // 发牌 (点击法阵触发)
         function distributeCard() {
             if (state.currentSlot > 2) return;
 
@@ -375,7 +410,6 @@
             const targetSlot = document.getElementById(`slot-${index}`);
             const cardData = state.selectedCards[index];
 
-            // 创建飞行卡片
             const card = document.createElement('div');
             card.className = 'flying-card';
             
@@ -394,40 +428,33 @@
                 </div>
             `;
 
-            // 起点：法阵中心
-            const startRect = trigger.getBoundingClientRect();
-            // 修正居中
-            const startX = startRect.left + startRect.width/2 - 40; // 40是卡宽的一半
-            const startY = startRect.top + startRect.height/2 - 70; // 70是卡高的一半
-
-            card.style.left = startX + 'px';
-            card.style.top = startY + 'px';
+            // 起点：牌堆中心
+            const startRect = deckStack.getBoundingClientRect();
+            // 80是牌堆宽, 40是半宽; 140是高, 70是半高
+            // flying-card也是80x140，所以直接对齐左上角即可
+            card.style.left = startRect.left + 'px';
+            card.style.top = startRect.top + 'px';
             document.body.appendChild(card);
 
             // 终点：卡槽
             const endRect = targetSlot.getBoundingClientRect();
-            // 卡槽和卡片尺寸一致，直接对齐 left/top
             const endX = endRect.left; 
             const endY = endRect.top;
 
-            // 强制重绘后执行移动
             requestAnimationFrame(() => {
-                card.style.transform = `translate(${endX - startX}px, ${endY - startY}px)`;
+                card.style.transform = `translate(${endX - startRect.left}px, ${endY - startRect.top}px)`;
             });
 
-            // 绑定点击揭开
             card.onclick = () => revealCard(card, index);
 
             state.currentSlot++;
             if (state.currentSlot > 2) {
+                deckStack.style.opacity = 0;
+                deckStack.style.pointerEvents = 'none';
                 statusText.innerText = "请点击卡片，揭开真相。";
-                // 此时法阵消失或淡出，把舞台留给卡片
-                trigger.style.opacity = 0.5;
-                trigger.style.pointerEvents = 'none';
             }
         }
 
-        // 揭开 (聚焦模式)
         function revealCard(cardEl, index) {
             if (cardEl.classList.contains('revealed')) return;
 
@@ -444,7 +471,7 @@
             cardEl.classList.remove('zoomed');
             cardEl.classList.add('revealed');
             document.getElementById('mask').style.opacity = 0;
-            cardEl.onclick = null; // 归位后不可点
+            cardEl.onclick = null; 
 
             state.cardsRevealed++;
             if (state.cardsRevealed === 3) {
