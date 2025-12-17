@@ -243,7 +243,7 @@
         <div class="card-ring" id="card-ring"></div>
     </div>
 
-    <script>
+<script>
         const cardRing = document.getElementById('card-ring');
         const introUi = document.getElementById('intro-ui');
         const mainBg = document.getElementById('main-bg');
@@ -254,16 +254,17 @@
         let pendingAiResult = null; 
         let activeFlippedCard = null; 
 
+        // 你的图片资源
         const SKINS = {
             MOON: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png", 
             STAR: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png", 
             SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
         };
 
-        // 显示错误弹窗
+        // ⭐️ 改动1：移除丑陋的错误弹窗，改用 Console 输出
         function showError(msg) {
-            document.getElementById('error-modal').style.display = 'flex';
-            document.getElementById('error-text').innerText = msg;
+            console.error("系统错误:", msg);
+            // 这里不再弹窗，而是让卡片显示错误信息，体验更好
         }
 
         async function preFetchAiResult(query) {
@@ -274,41 +275,52 @@
                     body: JSON.stringify({ query: query })
                 });
                 
-                // 解析返回结果（包含 raw 字符串）
                 const jsonResp = await response.json();
 
                 if (response.status !== 200) {
-                    throw new Error(`API Error ${response.status}: ${jsonResp.error || 'Unknown Error'}`);
+                    throw new Error(`服务异常 (${response.status})`);
                 }
 
-                // 核心修复：手动清洗 JSON，防止 AI 返回 Markdown
-                let rawContent = jsonResp.raw || "";
-                // 删掉 ```json 和 ``` 
-                let cleanContent = rawContent.replace(/```json/g, "").replace(/```/g, "").trim();
-                
-                let finalData;
-                try {
-                    finalData = JSON.parse(cleanContent);
-                } catch (parseErr) {
-                    throw new Error("JSON 解析失败，AI 返回了脏数据:\n" + cleanContent);
+                // 优先取后端清洗好的 result
+                let finalData = jsonResp.result;
+
+                // ⭐️ 改动2：终极容错
+                // 如果后端都没洗干净（极低概率），前端最后再试一次
+                if (!finalData || !finalData.title) {
+                    if (jsonResp.debug_raw) {
+                        try {
+                            const raw = jsonResp.debug_raw;
+                            const match = raw.match(/\{[\s\S]*\}/);
+                            if(match) finalData = JSON.parse(match[0]);
+                        } catch(e) {
+                            console.warn("前端补救解析也失败了");
+                        }
+                    }
+                }
+
+                // 还没数据？那就说明这次请求彻底废了
+                if (!finalData || !finalData.title) {
+                    throw new Error("无效的命运回响");
                 }
 
                 pendingAiResult = finalData;
 
+                // 如果卡片已经翻开，立刻刷新内容
                 if (activeFlippedCard) {
                     renderCardContent(activeFlippedCard, finalData);
                 }
 
             } catch (e) {
-                console.error(e);
-                showError(e.message); // 弹窗报错
+                showError(e.message);
                 
-                // 失败状态显示
+                // ⭐️ 改动3：优雅降级
+                // 不弹报错框，而是生成一张“故障卡牌”
+                // 这让错误看起来像是一种神秘的“信号干扰”效果
                 pendingAiResult = {
                     id: "ERR",
-                    title: "连接中断",
-                    enTitle: "CONNECTION ERROR",
-                    desc: "无法解析命运信号。请检查 API 配置或重试。"
+                    title: "信号干扰",
+                    enTitle: "SIGNAL INTERRUPTED",
+                    desc: "灵界信号微弱，无法解析。请重新尝试连接..."
                 };
                 if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
             }
@@ -316,7 +328,7 @@
 
         function startRitual() {
             const query = document.getElementById('user-input').value;
-            if(!query) return alert("心诚则灵...");
+            if(!query) return alert("请输入心中的疑惑...");
             introUi.classList.add('hidden');
             preFetchAiResult(query);
             generateVortex();
@@ -388,6 +400,7 @@
             const overlay = card.querySelector('.content-overlay');
             const frontFace = card.querySelector('.face.front');
             
+            // 安全解构，防止 undefined 报错
             const roman = data.id || "??";
             const title = data.title || "未知";
             const enTitle = data.enTitle || "";
@@ -430,3 +443,4 @@
     </script>
 </body>
 </html>
+
