@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V3.1 (NO-AI)</title>
+    <title>DESTINY PROTOCOL V3.2 FIXED</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
 
     <style>
+        /* 1. 强制全屏撑开，防止塌陷 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { -webkit-text-size-adjust: 100%; }
-        body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; /* 禁止滚动 */
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
-            display: flex; flex-direction: column; align-items: center;
+        }
+
+        body {
+            display: flex; flex-direction: column; /* 上下布局 */
+            align-items: center;
             perspective: 1000px;
         }
 
@@ -24,9 +29,9 @@
             --gold: #d4af37;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
-            /* 卡片尺寸定义 */
-            --card-w-mobile: 90px; 
-            --card-h-mobile: 155px;
+            /* 调整手机端卡片尺寸 */
+            --card-w-mobile: 80px; 
+            --card-h-mobile: 140px;
             --card-w-zoom: 240px;
             --card-h-zoom: 420px;
         }
@@ -37,15 +42,21 @@
             z-index: -1;
         }
 
-        /* --- 1. 顶部魔法阵区域 --- */
+        /* --- 区域 1: 舞台区 (占屏幕上方的 65%) --- */
         .stage-area {
-            flex: 1; width: 100%; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; position: relative;
-            z-index: 10; transition: transform 0.5s;
+            flex: 65; /* 权重 65 */
+            width: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative;
+            z-index: 10;
         }
 
+        /* 魔法阵 */
         .magic-circle {
             width: 140px; height: 140px; border-radius: 50%; position: relative;
+            /* 加上 margin-bottom 把下面的按钮顶下去，防止重叠 */
+            margin-bottom: 30px; 
             border: 2px dashed var(--neon); box-shadow: 0 0 30px var(--neon), inset 0 0 20px var(--neon);
             display: flex; justify-content: center; align-items: center;
             animation: rotateSlow 20s linear infinite;
@@ -54,7 +65,7 @@
         }
         .magic-circle.active {
             box-shadow: 0 0 60px var(--neon), inset 0 0 40px var(--neon);
-            animation: rotateFast 2s linear infinite; /* 加速旋转 */
+            animation: rotateFast 2s linear infinite; 
         }
         .magic-circle::before {
             content: ''; position: absolute; width: 85%; height: 85%; border-radius: 50%;
@@ -67,51 +78,63 @@
             position: absolute; width: 60px; height: 100px;
             transform-style: preserve-3d; cursor: pointer;
             transition: opacity 0.5s;
+            z-index: 20;
         }
         .deck-card {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #222; border: 1px solid #444; border-radius: 4px;
             background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
             background-size: 10px 10px;
-            transition: transform 0.3s;
         }
 
-        /* 输入与按钮 */
+        /* 控制面板 (不再绝对定位，而是自然流布局) */
         .control-panel {
-            position: absolute; bottom: 20%; width: 280px; text-align: center;
-            transition: opacity 0.5s, transform 0.5s;
+            width: 280px; text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            transition: opacity 0.5s;
+            z-index: 30;
         }
         input {
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--gold-dim);
-            border-radius: 8px; color: var(--gold); padding: 12px; text-align: center; outline: none; margin-bottom: 20px;
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.5);
+            border-radius: 10px; color: var(--gold); padding: 12px; text-align: center; outline: none; 
+            margin-bottom: 15px; font-family: 'Noto Serif SC', serif;
         }
         .ritual-btn {
             background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 12px 40px; border-radius: 8px; font-size: 16px; font-weight: 700;
-            user-select: none; touch-action: manipulation;
-            transition: all 0.2s;
+            padding: 12px 40px; border-radius: 10px; font-size: 18px; font-weight: 700;
+            user-select: none; touch-action: manipulation; /* 防止双击缩放 */
+            transition: all 0.2s; cursor: pointer;
         }
         .ritual-btn:active { background: rgba(212, 175, 55, 0.2); transform: scale(0.95); }
 
-        /* --- 2. 底部卡槽区域 (三位一体) --- */
+        .helper-text {
+            margin-top: 20px;
+            color: #888; font-size: 14px; opacity: 0; transition: opacity 0.5s; pointer-events: none;
+            text-shadow: 0 0 5px black;
+        }
+
+        /* --- 区域 2: 卡槽区 (占屏幕下方的 35%) --- */
         .slots-container {
-            position: absolute; bottom: 30px; width: 100%; height: 180px;
-            display: flex; justify-content: space-evenly; align-items: center;
-            z-index: 20; opacity: 0; pointer-events: none;
-            transition: opacity 1s;
+            flex: 35; /* 权重 35 */
+            width: 100%;
+            display: flex; justify-content: space-evenly; align-items: center; /* 垂直居中 */
+            padding-bottom: 20px;
+            opacity: 0; pointer-events: none; transition: opacity 1s;
         }
         .slot {
             width: var(--card-w-mobile); height: var(--card-h-mobile);
             border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px;
-            position: relative; perspective: 1000px;
+            position: relative;
         }
         .slot::after {
             content: attr(data-label);
             position: absolute; bottom: -25px; width: 100%; text-align: center;
-            color: #666; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
+            color: #555; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
         }
 
-        /* 飞行/落位的卡片 */
+        /* --- 动画元素 --- */
+        
+        /* 飞行卡片 */
         .flying-card {
             position: fixed; width: var(--card-w-mobile); height: var(--card-h-mobile);
             border-radius: 6px; transform-style: preserve-3d;
@@ -121,67 +144,64 @@
         
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; overflow: hidden; }
         
-        /* 背面纹理系统 */
+        /* 卡背 */
         .back { background-color: #111; background-size: cover; background-position: center; border: 1px solid #444; }
         .back.default { background-image: linear-gradient(45deg, #222 25%, #111 25%), linear-gradient(-45deg, #222 25%, #111 25%); background-size: 4px 4px; }
         .back.moon { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png'); }
         .back.star { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png'); }
         .back.sun  { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png'); }
 
+        /* 卡面 (信息结构优化) */
         .front { 
             transform: rotateY(180deg); background: #000; 
             display: flex; flex-direction: column; justify-content: flex-end;
             box-shadow: inset 0 0 0 1px var(--gold-dim);
         }
         .front-content {
-            padding: 10px; text-align: center; background: rgba(0,0,0,0.85);
+            padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
             border-top: 1px solid var(--gold-dim);
+            backdrop-filter: blur(2px);
         }
-        .card-name { color: var(--gold); font-size: 16px; font-weight: bold; margin-bottom: 4px; }
-        .card-keywords { color: #ccc; font-size: 10px; opacity: 0.8; }
+        .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+        .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
 
-        /* --- 3. 聚焦模式 (Zoom Mode) --- */
+        /* 聚焦模式 */
         .overlay-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 90;
+            background: rgba(0,0,0,0.95); z-index: 90;
             opacity: 0; pointer-events: none; transition: opacity 0.5s;
-            backdrop-filter: blur(5px);
         }
+        /* 放大后的样式 */
         .flying-card.zoomed {
             width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
             z-index: 100;
             top: 50% !important; left: 50% !important;
-            transform: translate(-50%, -50%) rotateY(180deg) !important; /* 强制翻转 */
-            box-shadow: 0 0 50px rgba(157, 0, 255, 0.5);
+            transform: translate(-50%, -50%) rotateY(180deg) !important;
+            box-shadow: 0 0 50px rgba(157, 0, 255, 0.6);
         }
         .flying-card.zoomed .card-name { font-size: 24px; margin-bottom: 10px; }
-        .flying-card.zoomed .card-keywords { font-size: 14px; }
+        .flying-card.zoomed .card-keywords { font-size: 14px; color: #fff; transform: scale(1); white-space: normal; }
 
-        /* --- 4. 命运回响面板 (Synthesis) --- */
+        /* 解读面板 */
         .synthesis-panel {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, #000 90%, transparent);
-            padding: 30px 20px 50px; text-align: center;
+            padding: 30px 20px 60px; text-align: center;
             transform: translateY(100%); transition: transform 0.8s ease-out;
             z-index: 95;
         }
-        .synthesis-title { color: var(--neon); font-family: 'Cinzel'; margin-bottom: 15px; font-size: 14px; letter-spacing: 2px; }
-        .synthesis-text { color: #eee; font-size: 14px; line-height: 1.8; text-align: justify; max-height: 200px; overflow-y: auto; }
+        .synthesis-title { color: var(--neon); font-family: 'Cinzel'; margin-bottom: 15px; font-size: 16px; letter-spacing: 4px; }
+        .synthesis-text { color: #ececec; font-size: 15px; line-height: 1.8; text-align: justify; max-height: 250px; overflow-y: auto; }
 
         /* 动画关键帧 */
         @keyframes rotateSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes chaosFly { 
             0% { transform: translate(0,0) rotate(0); }
-            25% { transform: translate(30px, -40px) rotate(10deg); }
-            50% { transform: translate(-20px, 20px) rotate(-5deg); }
-            75% { transform: translate(10px, -10px) rotate(5deg); }
+            25% { transform: translate(40px, -50px) rotate(15deg); }
+            50% { transform: translate(-30px, 30px) rotate(-10deg); }
+            75% { transform: translate(20px, -20px) rotate(5deg); }
             100% { transform: translate(0,0) rotate(0); }
-        }
-
-        .helper-text {
-            position: absolute; top: 120px; width: 100%; text-align: center;
-            color: #888; font-size: 12px; opacity: 0; transition: opacity 0.5s; pointer-events: none;
         }
     </style>
 </head>
@@ -206,9 +226,8 @@
                 ontouchstart="startShuffle()" ontouchend="endShuffle()">
                 按住注入能量
             </button>
+            <div class="helper-text" id="helper-text"></div>
         </div>
-        
-        <div class="helper-text" id="helper-text"></div>
     </div>
 
     <div class="slots-container" id="slots-area">
@@ -223,27 +242,24 @@
     </div>
 
     <script>
-        // --- 1. 本地数据库 (Local Database) ---
+        // 本地数据 (仅供测试 UI)
         const TAROT_DATA = [
-            { id: "0", name: "愚者", en: "The Fool", keywords: "起点 · 自由 · 潜力", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
+            { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 无畏", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造 · 力量 · 专注", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
             { id: "II", name: "女祭司", en: "The High Priestess", keywords: "直觉 · 神秘 · 潜意识", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
             { id: "III", name: "女皇", en: "The Empress", keywords: "丰饶 · 母性 · 自然", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
-            { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 稳固", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
-            { id: "IX", name: "隐士", en: "The Hermit", keywords: "内省 · 孤独 · 指引", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
             { id: "X", name: "命运之轮", en: "Wheel of Fortune", keywords: "流转 · 机遇 · 宿命", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
             { id: "XII", name: "倒吊人", en: "The Hanged Man", keywords: "牺牲 · 等待 · 新视角", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
             { id: "XIII", name: "死神", en: "Death", keywords: "结束 · 转变 · 重生", img: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
             { id: "XIX", name: "太阳", en: "The Sun", keywords: "成功 · 喜悦 · 活力", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" }
         ];
 
-        // --- 2. 状态管理 ---
         let state = {
             shuffling: false,
-            destinyLocked: false, // 是否已锁定结果
-            selectedCards: [],    // 抽中的三张牌数据
-            currentSlot: 0,       // 当前要填入哪个卡槽 (0,1,2)
-            cardsRevealed: 0      // 已经翻开了几张
+            destinyLocked: false, 
+            selectedCards: [],
+            currentSlot: 0, 
+            cardsRevealed: 0 
         };
 
         const magicCircle = document.getElementById('magic-circle');
@@ -251,9 +267,6 @@
         const btn = document.getElementById('action-btn');
         const helper = document.getElementById('helper-text');
         
-        // --- 3. 交互逻辑 ---
-
-        // 阶段一：洗牌 (Shuffle)
         function startShuffle() {
             const query = document.getElementById('user-input').value;
             if(!query) return alert("请先输入心中的疑惑...");
@@ -263,7 +276,6 @@
             deckStack.style.opacity = 1;
             btn.innerText = "注入能量中...";
             
-            // 模拟洗牌动画
             document.querySelectorAll('.deck-card').forEach(c => {
                 c.style.animation = `chaosFly 0.5s infinite`;
             });
@@ -274,35 +286,29 @@
             state.shuffling = false;
             magicCircle.classList.remove('active');
             
-            // 锁定命运：随机抽3张
             lockDestiny(); 
             
-            // UI 变更
             document.querySelectorAll('.deck-card').forEach(c => c.style.animation = 'none');
-            document.getElementById('controls').style.opacity = 0; // 隐藏输入框
-            document.getElementById('controls').style.pointerEvents = 'none';
             
-            // 提示抽牌
+            // 隐藏输入框和按钮
+            const input = document.getElementById('user-input');
+            input.style.display = 'none';
+            btn.style.display = 'none';
+
+            // 显示提示
             helper.innerText = "命运已定。请依次点击牌堆，抽取过去、现在、未来。";
             helper.style.opacity = 1;
             
-            // 激活牌堆点击
             deckStack.onclick = distributeCard;
         }
 
-        // 锁定命运 (本地随机)
         function lockDestiny() {
-            // 简单的洗牌算法
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
             state.selectedCards = [shuffled[0], shuffled[1], shuffled[2]];
-            console.log("命运已锁定:", state.selectedCards.map(c => c.name));
             state.destinyLocked = true;
-            
-            // TODO: 这里将来会触发后端 API 请求
-            document.getElementById('slots-area').style.opacity = 1; // 显示卡槽
+            document.getElementById('slots-area').style.opacity = 1; 
         }
 
-        // 阶段二：分发 (Distribute)
         function distributeCard() {
             if (state.currentSlot > 2) return;
 
@@ -310,11 +316,9 @@
             const targetSlot = document.getElementById(`slot-${cardIndex}`);
             const cardData = state.selectedCards[cardIndex];
             
-            // 1. 创建飞行卡片
             const card = document.createElement('div');
             card.className = 'flying-card';
             
-            // 确定背纹皮肤
             let skinClass = 'default';
             if(cardIndex === 0) skinClass = 'moon';
             if(cardIndex === 1) skinClass = 'star';
@@ -330,92 +334,80 @@
                 </div>
             `;
 
-            // 2. 初始位置：设在牌堆中心
+            // 1. 设置初始位置 (在牌堆)
             const startRect = deckStack.getBoundingClientRect();
             card.style.left = startRect.left + 'px';
             card.style.top = startRect.top + 'px';
             
             document.body.appendChild(card);
 
-            // 3. 飞行位置：设到目标卡槽
-            // 强制重绘
+            // 2. 强制重绘，计算终点
             card.getBoundingClientRect();
             
             const endRect = targetSlot.getBoundingClientRect();
-            // 计算居中偏移
-            const x = endRect.left + (endRect.width - 90)/2; // 90是卡宽
-            const y = endRect.top + (endRect.height - 155)/2; // 155是卡高
+            // 计算居中坐标 (卡片80宽，卡槽也是80宽，不需要额外偏移，直接对齐)
+            const x = endRect.left; 
+            const y = endRect.top; 
 
+            // 执行飞行动画
             card.style.transform = `translate(${x - startRect.left}px, ${y - startRect.top}px)`;
 
-            // 4. 绑定点击揭开事件
             card.onclick = () => revealCard(card, cardIndex);
 
-            // 更新状态
             state.currentSlot++;
             if(state.currentSlot > 2) {
-                deckStack.style.opacity = 0; // 隐藏牌堆
+                deckStack.style.opacity = 0; 
                 deckStack.style.pointerEvents = 'none';
-                helper.innerText = "请依次点击卡片，揭开真相。";
+                helper.innerText = "请点击卡片，揭开真相。";
             }
         }
 
-        // 阶段三：聚焦揭秘 (Zoom Reveal)
         function revealCard(cardEl, index) {
-            // 防止重复点击
             if(cardEl.classList.contains('revealed')) return;
             
-            // 1. 放大并居中
+            // 放大
             cardEl.classList.add('zoomed');
             document.getElementById('mask').style.opacity = 1;
             
-            // 2. 归位逻辑 (点击放大后的卡片)
+            // 归位事件
             cardEl.onclick = (e) => {
                 e.stopPropagation();
                 returnCard(cardEl, index);
             };
         }
 
-        // 归位
         function returnCard(cardEl, index) {
             cardEl.classList.remove('zoomed');
-            cardEl.classList.add('revealed'); // 标记已翻开
+            cardEl.classList.add('revealed');
             document.getElementById('mask').style.opacity = 0;
             
-            // 恢复点击事件为空 (归位后不能再点了，或者可以再次查看，看需求)
             cardEl.onclick = null; 
 
             state.cardsRevealed++;
-            
-            // 检查是否全部翻开
             if(state.cardsRevealed === 3) {
                 showSynthesis();
             }
         }
 
-        // 阶段四：最终解读
         function showSynthesis() {
             setTimeout(() => {
                 const panel = document.getElementById('final-panel');
                 panel.style.transform = 'translateY(0)';
                 
-                // 模拟打字机输出
                 const aiText = `命运的齿轮已经咬合。过去的【${state.selectedCards[0].name}】暗示了你潜意识的积淀，这直接导致了现在【${state.selectedCards[1].name}】的局面。而未来的【${state.selectedCards[2].name}】正在向你招手，只要你保持目前的觉知，答案自会显现。`;
                 
                 typeWriter(aiText, document.getElementById('ai-text'));
-            }, 1000);
+            }, 800);
         }
 
-        // 打字机特效
         function typeWriter(text, element) {
             element.innerHTML = "";
             let i = 0;
-            const speed = 50;
             function type() {
                 if (i < text.length) {
                     element.innerHTML += text.charAt(i);
                     i++;
-                    setTimeout(type, speed);
+                    setTimeout(type, 50);
                 }
             }
             type();
