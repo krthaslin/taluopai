@@ -3,85 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V24.5</title>
+    <title>DESTINY PROTOCOL V21 (Robuster)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
 
     <style>
-        /* 1. Basic Reset */
+        /* 强制重置 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { -webkit-text-size-adjust: none; text-size-adjust: none; }
-        body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
-            background-color: #050505; color: white;
+        html { -webkit-text-size-adjust: 100%; }
+
+        :root {
+            --void-bg: #050505;
+            --card-w: 135px; --card-h: 240px; /* PC */
+            --gold: #d4af37;
+            --gold-dim: rgba(212, 175, 55, 0.5);
+            --neon: #9d00ff;
+        }
+
+        /* 手机端物理尺寸 */
+        @media (max-width: 768px) {
+            :root { --card-w: 110px; --card-h: 195px; }
+        }
+
+        body {
+            margin: 0; background-color: var(--void-bg); color: white;
             font-family: 'Noto Serif SC', serif; 
+            overflow: hidden; height: 100vh;
             display: flex; justify-content: center; align-items: center;
             perspective: 1000px;
         }
 
-        :root {
-            /* Desktop Base */
-            --card-w: 135px; --card-h: 240px;
-            --gold: #d4af37; --gold-dim: rgba(212, 175, 55, 0.6); --neon: #9d00ff;
+        .bg-gradient {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%);
+            z-index: -1;
         }
 
-        /* Mobile Base: Slightly shorter to prevent overflow */
-        @media (max-width: 768px) {
-            :root { --card-w: 110px; --card-h: 185px; }
-        }
-
-        .bg-gradient { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%); z-index: -1; }
-
-        /* UI Layer */
+        /* UI层保持不变 */
         .intro-layer { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; width: 100%; transition: opacity 0.8s; }
         .crystal-ball { width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(157, 0, 255, 0.5), #220033 90%); box-shadow: 0 0 30px rgba(157, 0, 255, 0.4); margin-bottom: 40px; animation: floatBall 6s infinite; }
         .input-group { width: 280px; text-align: center; }
         input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 30px; color: var(--gold); padding: 15px 0; text-align: center; outline: none; margin-bottom: 25px; font-family: 'Noto Serif SC', serif; }
-        button { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 40px; border-radius: 30px; font-family: 'Noto Serif SC', serif; font-weight: 700; cursor: pointer; }
+        button { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 40px; border-radius: 30px; font-family: 'Noto Serif SC', serif; font-weight: 700; }
 
-        /* 3D Stage */
+        /* 3D 舞台 */
         .vortex-container { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; pointer-events: none; display: flex; justify-content: center; align-items: center; }
         .card-ring { position: absolute; transform-style: preserve-3d; transition: transform 2s ease-out; }
 
+        /* 卡片基础 */
         .tarot-card {
-            position: absolute; width: var(--card-w); height: var(--card-h);
+            position: absolute;
+            width: var(--card-w); height: var(--card-h);
             left: calc(var(--card-w) / -2); top: calc(var(--card-h) / -2);
             border-radius: 8px; transform-style: preserve-3d;
-            transition: transform 1s, opacity 1s; background-color: #222;
+            transition: transform 1s, opacity 1s;
+            background-color: #222;
         }
 
-        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; overflow: hidden; transition: background-image 0.3s; }
-        .face.back { background-color: #111; border: 1px solid #444; background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%), linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%); background-position: 0 0, 10px 10px; background-size: 20px 20px; background-repeat: repeat; }
+        .face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 8px;
+            overflow: hidden; 
+            transition: background-image 0.3s;
+        }
+
+        .face.back {
+            background-color: #111; border: 1px solid #444;
+            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%), linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%);
+            background-position: 0 0, 10px 10px; background-size: 20px 20px; background-repeat: repeat;
+        }
         .face.back.has-skin { background-size: cover !important; background-repeat: no-repeat !important; border: none; }
         .face.front { transform: rotateY(180deg); background-color: #000; background-size: cover; background-position: center; }
 
-        /* --- STABLE LAYOUT FIX --- */
+        /* --- V21 字体排版系统 (Typography System) --- */
         .content-overlay {
-            background: rgba(0, 0, 0, 0.85); width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             opacity: 0; transition: opacity 0.5s;
-            box-shadow: inset 0 0 0 1px var(--gold-dim); outline: 1px solid rgba(212, 175, 55, 0.6);
-            /* Standard Flex Column */
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 0 1px var(--gold-dim);
+            outline: 1px solid rgba(212, 175, 55, 0.6);
+            /* 电脑端默认 */
             padding: 20px;
         }
         .face.front.loaded .content-overlay { opacity: 1; }
 
-        /* Desktop Typography */
-        .title-group { 
-            text-align: center; margin-bottom: 20px; width: 100%; 
-            border-bottom: 1px solid var(--gold-dim); padding-bottom: 10px; 
-        }
+        /* 电脑端排版 */
+        .title-group { text-align: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid var(--gold-dim); padding-bottom: 10px; }
         .roman-num { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 10px; display: block; margin-bottom: 5px; }
-        .main-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 2px; white-space: nowrap; }
+        .main-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 2px; }
         .sub-title { font-family: 'Cinzel', serif; color: #888; font-size: 8px; margin-top: 5px; display: block; letter-spacing: 1px; }
-        .desc-text { color: #ddd; font-size: 10px; line-height: 1.8; text-align: justify; margin: 0; width: 100%; }
+        .desc-text { color: #ddd; font-size: 10px; line-height: 1.8; text-align: justify; margin: 0; padding-top: 10px; }
 
-        /* --- MOBILE FIXES --- */
+        /* --- 手机端排版重构 (Mobile Typography Fix) --- */
         @media (max-width: 768px) {
             .content-overlay { 
-                padding: 12px; 
+                padding: 12px; /* 边距适中 */
                 outline-offset: -4px; 
             }
 
@@ -91,58 +111,65 @@
                 border-bottom-width: 0.5px;
             }
 
-            /* Safe fonts that won't break layout */
-            .roman-num { font-size: 9px; margin-bottom: 2px; opacity: 0.8; }
+            /* 技巧：不要写 3px, 4px，写大一点然后 scale 下去，保证清晰 */
+            .roman-num { 
+                font-size: 6px; 
+                margin-bottom: 2px; 
+                opacity: 0.8;
+            }
 
+            /* 标题：必须显著大 */
             .main-title { 
-                font-size: 16px; 
-                letter-spacing: 1px; 
-                margin: 2px 0;
+                font-size: 12px; /* 放大后约 31px，足够醒目 */
+                line-height: 1.2;
+                letter-spacing: 1px;
             }
 
+            /* 英文：必须显著小 */
             .sub-title {
-                font-size: 8px; 
+                font-size: 4px; /* 放大后约 10px */
                 margin-top: 2px;
-                zoom: 0.9; /* Subtle reduction */
+                opacity: 0.6;
             }
 
+            /* 正文：黄金比例 */
             .desc-text {
-                font-size: 10px; 
-                line-height: 1.5; 
-                text-align: justify;
-                /* Prevent overflow if text is too long */
-                max-height: 95px;
-                overflow-y: hidden; 
+                font-size: 5px; /* 放大后约 13px，阅读舒适 */
+                line-height: 1.6;
+                color: #ececec;
             }
         }
 
-        /* Animation */
+        /* 动画与交互 */
         .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
         .tarot-card.chosen { pointer-events: auto; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s; z-index: 999; }
         
         .tarot-card.flipped { z-index: 1000 !important; box-shadow: 0 0 100px var(--neon); transform: translate3d(0, 0, 400px) rotateY(180deg) scale(1.5) !important; }
         @media (max-width: 768px) {
-            /* Mobile Zoom: 2.6x at 220px distance */
             .tarot-card.flipped { transform: translate3d(0, 0, 220px) rotateY(180deg) scale(2.6) !important; }
         }
-        @keyframes floatBall { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
-        /* Debug Bar */
-        #live-debug {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(0, 30, 0, 0.95); color: #00ff00;
-            font-family: monospace; font-size: 10px; line-height: 1.4;
-            padding: 8px; z-index: 99999; text-align: left;
-            border-bottom: 1px solid #00ff00;
-            display: none; white-space: pre-wrap; word-break: break-all;
-            max-height: 120px; overflow-y: scroll;
+        .hidden { opacity: 0; pointer-events: none; }
+
+        /* 错误弹窗 */
+        #error-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 99999;
+            display: none; justify-content: center; align-items: center;
+            flex-direction: column; padding: 20px;
         }
+        #error-text { color: red; font-family: monospace; font-size: 12px; background: #111; padding: 10px; border: 1px solid red; width: 100%; overflow: scroll; height: 50%; }
+        #close-err { margin-top: 20px; padding: 10px 30px; background: white; color: black; border: none; }
     </style>
 </head>
 <body>
 
-    <div id="live-debug">Waiting...</div>
+    <div id="error-modal">
+        <h3 style="color:white">API 连接失败</h3>
+        <div id="error-text"></div>
+        <button id="close-err" onclick="document.getElementById('error-modal').style.display='none'">关闭并重试</button>
+    </div>
+
     <div class="bg-gradient" id="main-bg"></div>
 
     <div class="intro-layer" id="intro-ui">
@@ -158,16 +185,6 @@
     </div>
 
     <script>
-        function logToScreen(msg, isError = false) {
-            const el = document.getElementById('live-debug');
-            el.style.display = 'block';
-            el.style.backgroundColor = isError ? 'rgba(50, 0, 0, 0.95)' : 'rgba(0, 30, 0, 0.95)';
-            el.style.color = isError ? '#ff4444' : '#00ff00';
-            const time = new Date().toLocaleTimeString();
-            el.innerText = `[${time}] ${msg}`;
-            if(isError) console.error(msg); else console.log(msg);
-        }
-
         const cardRing = document.getElementById('card-ring');
         const introUi = document.getElementById('intro-ui');
         const mainBg = document.getElementById('main-bg');
@@ -184,8 +201,13 @@
             SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
         };
 
+        // 显示错误弹窗
+        function showError(msg) {
+            document.getElementById('error-modal').style.display = 'flex';
+            document.getElementById('error-text').innerText = msg;
+        }
+
         async function preFetchAiResult(query) {
-            logToScreen("Connecting to Vercel API...");
             try {
                 const response = await fetch('/api/tarot', {
                     method: 'POST',
@@ -193,31 +215,52 @@
                     body: JSON.stringify({ query: query })
                 });
                 
-                if (response.status !== 200) {
-                    const err = await response.json();
-                    throw new Error(`API Error ${response.status}: ${err.error || 'Unknown'}`);
-                }
-                
+                // 解析返回结果（包含 raw 字符串）
                 const jsonResp = await response.json();
 
-                // Show raw debug info on screen
-                if (jsonResp.debug_raw) {
-                    logToScreen("【AI Raw Output】\n" + jsonResp.debug_raw.substring(0, 50) + "...");
+                if (response.status !== 200) {
+                    throw new Error(`API Error ${response.status}: ${jsonResp.error || 'Unknown Error'}`);
                 }
 
-                // Handle both data formats (direct or nested in result)
-                const finalData = jsonResp.result || jsonResp; 
-                pendingAiResult = finalData; 
+                // --- 核心修复：更强力的 JSON 提取 ---
+                // 我们不再假设只是简单的 markdown，而是用正则寻找第一个 '{' 和最后一个 '}'
+                let rawContent = jsonResp.raw || "";
+                
+                // 寻找 JSON 对象在字符串中的位置
+                const jsonStartIndex = rawContent.indexOf('{');
+                const jsonEndIndex = rawContent.lastIndexOf('}');
+                
+                if (jsonStartIndex === -1 || jsonEndIndex === -1) {
+                     // 如果找不到大括号，说明 AI 真的没返回 JSON，这时才报错
+                     throw new Error("AI 返回了非 JSON 数据: " + rawContent.substring(0, 100));
+                }
+
+                // 截取纯净的 JSON 字符串
+                let cleanContent = rawContent.substring(jsonStartIndex, jsonEndIndex + 1);
+                
+                let finalData;
+                try {
+                    finalData = JSON.parse(cleanContent);
+                } catch (parseErr) {
+                    throw new Error("JSON 解析失败: " + cleanContent);
+                }
+
+                pendingAiResult = finalData;
 
                 if (activeFlippedCard) {
                     renderCardContent(activeFlippedCard, finalData);
                 }
 
             } catch (e) {
-                logToScreen("Error: " + e.message, true);
+                console.error(e);
+                showError(e.message); // 弹窗报错
+                
+                // 失败状态显示
                 pendingAiResult = {
-                    id: "ERR", title: "信号丢失", enTitle: "SIGNAL LOST",
-                    desc: "无法连接到主脑。\n" + e.message
+                    id: "ERR",
+                    title: "连接中断",
+                    enTitle: "CONNECTION ERROR",
+                    desc: "无法解析命运信号。请检查 API 配置或重试。"
                 };
                 if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
             }
