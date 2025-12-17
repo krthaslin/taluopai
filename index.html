@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.6 BALANCED</title>
+    <title>DESTINY PROTOCOL V4.7 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,6 @@
             left: 0; top: 0; right: 0; bottom: 0;
         }
 
-        /* --- 变量定义 --- */
         :root {
             --gold: #d4af37;
             --gold-dim: rgba(212, 175, 55, 0.5);
@@ -38,7 +37,7 @@
             --storm-card-h: 100px;
         }
 
-        /* 桌面端/大屏适配 (>768px) */
+        /* 桌面端适配 (>768px) */
         @media (min-width: 768px) {
             :root {
                 --card-w: 150px; 
@@ -160,21 +159,23 @@
             height: 20px; transition: opacity 0.3s; text-shadow: 0 2px 4px black;
         }
 
-        /* --- 顶部结果 (修改点 2：位置下沉) --- */
+        /* --- 顶部结果 (修改点：位置下沉，避免贴顶) --- */
         .final-display {
             position: absolute; 
             width: 85%; max-width: 600px;
             text-align: center; opacity: 0; pointer-events: none;
             transition: opacity 1s ease; z-index: 30;
             
-            /* 手机默认位置 */
-            top: 22%; 
+            /* 手机默认位置：下沉到 35% */
+            top: 35%; 
         }
         
-        /* 电脑端结果位置特调 */
+        /* 电脑端位置特调 */
         @media (min-width: 768px) {
             .final-display {
-                top: 35%; /* 电脑端更靠下，接近牌堆位置 */
+                /* 电脑端下沉到 45% (接近屏幕中心略偏上) */
+                top: 45%; 
+                transform: translateY(-50%);
             }
         }
 
@@ -386,9 +387,9 @@
             tornadoCon.innerHTML = '';
             state.tornadoCards = [];
             
-            // (修改点 1：电脑端卡片数量适量减少)
             const isDesktop = window.innerWidth > 768;
-            const count = isDesktop ? 80 : 36; // 从 120 减到 80，更平衡
+            // 修正：电脑版从 120 降至 60
+            const count = isDesktop ? 60 : 36; 
             const yRange = isDesktop ? 1000 : 600; 
             const rBase = isDesktop ? 350 : 120;   
             const rVar = isDesktop ? 400 : 150;    
