@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V21 (Logic Fixed)</title>
+    <title>DESTINY PROTOCOL V25 MAGIC CIRCLE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,12 +41,70 @@
             z-index: -1;
         }
 
-        /* UI层保持不变 */
+        /* UI层 */
         .intro-layer { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; width: 100%; transition: opacity 0.8s; }
-        .crystal-ball { width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(157, 0, 255, 0.5), #220033 90%); box-shadow: 0 0 30px rgba(157, 0, 255, 0.4); margin-bottom: 40px; animation: floatBall 6s infinite; }
+        
+        /* --- 修改点 3：全新的旋转魔法阵 --- */
+        .magic-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            position: relative;
+            margin-bottom: 40px;
+            /* 外圈：紫色光晕和虚线 */
+            border: 2px dashed var(--neon);
+            box-shadow: 0 0 30px var(--neon), inset 0 0 20px var(--neon);
+            display: flex; justify-content: center; align-items: center;
+            animation: rotateCircleSlow 20s linear infinite;
+            background: radial-gradient(circle, transparent 60%, rgba(157, 0, 255, 0.2));
+        }
+
+        /* 中圈：金色符文圈 (反向旋转) */
+        .magic-circle::before {
+            content: ''; position: absolute;
+            width: 85%; height: 85%;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            /* 使用复杂的边框模拟符文刻度 */
+            border-top: 3px double var(--gold);
+            border-bottom: 3px double var(--gold);
+            box-shadow: inset 0 0 15px var(--gold-dim);
+            animation: rotateCircleFast 12s linear infinite reverse;
+        }
+
+        /* 内核：能量核心 (脉冲) */
+        .magic-circle::after {
+            content: ''; position: absolute;
+            width: 40%; height: 40%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, var(--gold), var(--neon) 70%, transparent);
+            box-shadow: 0 0 20px var(--gold), 0 0 40px var(--neon);
+            animation: pulseCore 2s ease-in-out infinite alternate;
+        }
+
+        /* 魔法阵动画定义 */
+        @keyframes rotateCircleSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateCircleFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulseCore { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
+        /* ---------------------------------- */
+
+
         .input-group { width: 280px; text-align: center; }
-        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 30px; color: var(--gold); padding: 15px 0; text-align: center; outline: none; margin-bottom: 25px; font-family: 'Noto Serif SC', serif; }
-        button { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 40px; border-radius: 30px; font-family: 'Noto Serif SC', serif; font-weight: 700; }
+        
+        input { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3); 
+            /* --- 修改点 1：圆角收敛 --- */
+            border-radius: 10px; 
+            color: var(--gold); padding: 15px 0; text-align: center; outline: none; margin-bottom: 25px; font-family: 'Noto Serif SC', serif; 
+        }
+        
+        button { 
+            background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 40px; 
+            /* --- 修改点 1 & 2：圆角收敛，文字加大 --- */
+            border-radius: 10px; 
+            font-size: 18px;
+            font-family: 'Noto Serif SC', serif; font-weight: 700; 
+        }
 
         /* 3D 舞台 */
         .vortex-container { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; pointer-events: none; display: flex; justify-content: center; align-items: center; }
@@ -173,7 +231,8 @@
     <div class="bg-gradient" id="main-bg"></div>
 
     <div class="intro-layer" id="intro-ui">
-        <div class="crystal-ball"></div>
+        <div class="magic-circle"></div>
+        
         <div class="input-group">
             <input type="text" id="user-input" placeholder="输入所求之事..." autocomplete="off">
             <button onclick="startRitual()">开启法阵</button>
@@ -215,36 +274,23 @@
                     body: JSON.stringify({ query: query })
                 });
                 
+                // 解析返回结果（包含 raw 字符串）
                 const jsonResp = await response.json();
 
                 if (response.status !== 200) {
-                    throw new Error(`API 报错: ${jsonResp.error || '未知错误'}`);
+                    throw new Error(`API Error ${response.status}: ${jsonResp.error || 'Unknown Error'}`);
                 }
 
-                // 核心适配逻辑：
-                // 后端现在返回结构是： { result: {id...}, debug_raw: "...", ... }
-                // 我们优先取 result
-                let finalData = jsonResp.result || jsonResp;
-
-                // 补救措施：如果 result 是空的，但有 debug_raw，尝试前端清洗
-                if (!finalData || !finalData.title) {
-                    if (jsonResp.debug_raw) {
-                        console.log("尝试前端补救解析...");
-                        const raw = jsonResp.debug_raw;
-                        const start = raw.indexOf('{');
-                        const end = raw.lastIndexOf('}');
-                        if (start !== -1 && end !== -1) {
-                            try {
-                                finalData = JSON.parse(raw.substring(start, end + 1));
-                            } catch(e) {
-                                console.error("前端解析也失败了");
-                            }
-                        }
-                    }
-                }
-
-                if (!finalData || !finalData.title) {
-                    throw new Error("数据格式错误，请重试");
+                // 核心修复：手动清洗 JSON，防止 AI 返回 Markdown
+                let rawContent = jsonResp.raw || "";
+                // 删掉 ```json 和 ``` 
+                let cleanContent = rawContent.replace(/```json/g, "").replace(/```/g, "").trim();
+                
+                let finalData;
+                try {
+                    finalData = JSON.parse(cleanContent);
+                } catch (parseErr) {
+                    throw new Error("JSON 解析失败，AI 返回了脏数据:\n" + cleanContent);
                 }
 
                 pendingAiResult = finalData;
@@ -255,13 +301,14 @@
 
             } catch (e) {
                 console.error(e);
-                showError(e.message); 
+                showError(e.message); // 弹窗报错
                 
+                // 失败状态显示
                 pendingAiResult = {
                     id: "ERR",
                     title: "连接中断",
                     enTitle: "CONNECTION ERROR",
-                    desc: "无法解析命运信号。请检查网络或稍后重试。"
+                    desc: "无法解析命运信号。请检查 API 配置或重试。"
                 };
                 if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
             }
