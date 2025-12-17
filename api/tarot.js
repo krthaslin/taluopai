@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // Allow CORS for debugging
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
 
@@ -23,16 +24,16 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        temperature: 1.3,
+        temperature: 1.3, // High creativity
         messages: [
           {
             role: "system",
-            // 再次强化指令
-            content: "你是一位塔罗师。请抽一张牌。必须返回纯净JSON字符串，严禁Markdown格式。格式：{\"id\": \"罗马数字\", \"title\": \"中文牌名\", \"enTitle\": \"英文牌名(全大写)\", \"desc\": \"解读\"}。"
+            // Stricter prompt
+            content: "You are a Tarot Reader. Output ONLY a valid JSON object. No markdown, no conversational text. Format: {\"id\": \"Roman Numeral\", \"title\": \"Card Name\", \"enTitle\": \"English Name\", \"desc\": \"Reading under 50 words\"}."
           },
           {
             role: "user",
-            content: `求问：${query}`
+            content: `Question: ${query}`
           }
         ],
         response_format: { type: "json_object" }
@@ -46,31 +47,33 @@ export default async function handler(req, res) {
     const data = await response.json();
     const rawContent = data.choices[0].message.content;
     
-    // --- 核心修复：外科手术式提取 JSON ---
-    // 无论 AI 回复什么，我们只找第一个 '{' 和最后一个 '}' 之间的内容
+    // --- Surgical JSON Extraction ---
+    // This ignores everything before the first '{' and after the last '}'
     const jsonStartIndex = rawContent.indexOf('{');
     const jsonEndIndex = rawContent.lastIndexOf('}');
     
     if (jsonStartIndex === -1 || jsonEndIndex === -1) {
-        throw new Error("AI没有返回有效的JSON大括号");
+        throw new Error("AI did not return a valid JSON object");
     }
 
     const cleanContent = rawContent.substring(jsonStartIndex, jsonEndIndex + 1);
-    let parsedData;
     
+    let parsedData;
     try {
         parsedData = JSON.parse(cleanContent);
     } catch (e) {
-        throw new Error("JSON解析依然失败: " + cleanContent);
+        throw new Error("JSON Parse Failed: " + cleanContent);
     }
 
+    // Send back result AND debug info
     res.status(200).json({
         result: parsedData,
-        debug_raw: rawContent, // 依然保留原始数据供前端调试
+        debug_raw: rawContent, 
         time_ms: Date.now() - startTime
     });
 
   } catch (error) {
+    console.error("Server Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
