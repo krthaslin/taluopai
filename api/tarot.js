@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // 允许跨域，方便调试
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
 
@@ -24,10 +23,11 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        temperature: 1.4, // 高随机性
+        temperature: 1.3,
         messages: [
           {
             role: "system",
+            // 再次强化指令
             content: "你是一位塔罗师。请抽一张牌。必须返回纯净JSON字符串，严禁Markdown格式。格式：{\"id\": \"罗马数字\", \"title\": \"中文牌名\", \"enTitle\": \"英文牌名(全大写)\", \"desc\": \"解读\"}。"
           },
           {
@@ -46,15 +46,28 @@ export default async function handler(req, res) {
     const data = await response.json();
     const rawContent = data.choices[0].message.content;
     
-    // 清洗 Markdown
-    let cleanContent = rawContent.replace(/```json/g, "").replace(/```/g, "").trim();
-    let parsedData = JSON.parse(cleanContent);
+    // --- 核心修复：外科手术式提取 JSON ---
+    // 无论 AI 回复什么，我们只找第一个 '{' 和最后一个 '}' 之间的内容
+    const jsonStartIndex = rawContent.indexOf('{');
+    const jsonEndIndex = rawContent.lastIndexOf('}');
+    
+    if (jsonStartIndex === -1 || jsonEndIndex === -1) {
+        throw new Error("AI没有返回有效的JSON大括号");
+    }
 
-    // --- 关键修改：把原始数据包在 debug 字段里发回去 ---
+    const cleanContent = rawContent.substring(jsonStartIndex, jsonEndIndex + 1);
+    let parsedData;
+    
+    try {
+        parsedData = JSON.parse(cleanContent);
+    } catch (e) {
+        throw new Error("JSON解析依然失败: " + cleanContent);
+    }
+
     res.status(200).json({
-        result: parsedData,       // 解析后的可用数据
-        debug_raw: rawContent,    // AI 的原始回复 (给你看的)
-        time_ms: Date.now() - startTime // 耗时
+        result: parsedData,
+        debug_raw: rawContent, // 依然保留原始数据供前端调试
+        time_ms: Date.now() - startTime
     });
 
   } catch (error) {
