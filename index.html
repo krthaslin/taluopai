@@ -344,9 +344,10 @@
         <div class="card-ring" id="card-ring"></div>
     </div>
 
-    <script>
+<script>
+        // 错误监控
         window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.error('系统错误: ' + msg);
+            console.error('System Error: ' + msg);
             return false;
         };
 
@@ -358,43 +359,46 @@
         const TOTAL_CARDS = isMobile ? 12 : 24; 
         
         let allCards = [];
-        let pendingAiResult = null;
-        let isFetching = false;
-        let activeFlippedCard = null; 
+        let pendingAiResult = null; // 存放 AI 结果
+        let activeFlippedCard = null; // 当前正在看的卡片
 
-        // GitHub 图片链接
+        // 图片素材
         const SKINS = {
             MOON: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png", 
             STAR: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png", 
             SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
         };
 
-        // 兜底数据 (已更新为包含英文标题的结构)
-        const LOCAL_BACKUP = [
-            { id: "X", title: "命运之轮", enTitle: "THE WHEEL OF FORTUNE", desc: "巨大转机已至。这不是你能控制的，顺势而为，命运的齿轮开始转动。" },
-            { id: "IX", title: "隐士", enTitle: "THE HERMIT", desc: "答案不在外界喧嚣中。向内探索，独处与静默会为你带来真正的智慧。" },
-            { id: "XIX", title: "太阳", enTitle: "THE SUN", desc: "纯粹的生命力与喜悦。所有阴霾即将散去，真相与成功就在眼前。" },
-            { id: "XVIII", title: "月亮", enTitle: "THE MOON", desc: "潜意识深处的涌动。不安与幻象中蕴藏着真相，直觉比理智更准确。" }
-        ];
+        // --- 核心修改：没有兜底数据了 ---
+        // const LOCAL_BACKUP = []; // DELETED
 
         async function preFetchAiResult(query) {
-            isFetching = true;
             try {
                 const response = await fetch('/api/tarot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: query })
                 });
-                if (!response.ok) throw new Error("API Error");
+                
+                if (!response.ok) throw new Error("API Connection Failed");
+                
                 const data = await response.json();
-                pendingAiResult = data;
-                if (activeFlippedCard) renderCardContent(activeFlippedCard, data);
+                pendingAiResult = data; // 拿到真数据
+
+                // 热更新：如果用户正盯着"Loading"看，立刻把内容刷上去
+                if (activeFlippedCard) {
+                    renderCardContent(activeFlippedCard, data);
+                }
+
             } catch (e) {
-                console.log("Using Backup Data");
-                pendingAiResult = LOCAL_BACKUP[Math.floor(Math.random() * LOCAL_BACKUP.length)];
-                if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
-            } finally {
-                isFetching = false;
+                console.error("AI Fetch Failed:", e);
+                // 失败了什么都不做，pendingAiResult 保持为 null
+                // 用户界面会一直显示 "连接中..." 或者你可以选择显示一个"连接失败"的提示
+                if (activeFlippedCard) {
+                    const overlay = activeFlippedCard.querySelector('.content-overlay');
+                    // 可选：如果超时太久，给用户一个反馈，或者就让他们等着
+                    // overlay.innerHTML = `<h3>信号微弱</h3><p>请保持专注...</p>`;
+                }
             }
         }
 
@@ -402,6 +406,8 @@
             const query = document.getElementById('user-input').value;
             if(!query) return alert("心诚则灵，请输入问题...");
             introUi.classList.add('hidden');
+            
+            // 发起请求，不设退路
             preFetchAiResult(query);
             generateVortex();
         }
@@ -418,6 +424,7 @@
             for(let i=0; i<TOTAL_CARDS; i++) {
                 const card = document.createElement('div');
                 card.className = 'tarot-card';
+                // 默认状态：暗金网格 (无 .has-skin)
                 card.innerHTML = `<div class="face back"></div><div class="face front"><div class="content-overlay"></div></div>`;
 
                 card.style.transform = `translate3d(0, 800px, -2000px)`; 
@@ -487,14 +494,12 @@
             const overlay = card.querySelector('.content-overlay');
             const frontFace = card.querySelector('.face.front');
             
-            // 数据容错处理
-            const roman = data.id || "??";
-            const title = data.title || "未知牌面";
-            // 如果后端还没更新 enTitle，暂时显示占位符
-            const enTitle = data.enTitle || "UNKNOWN ARCANA";
-            const desc = data.desc || "迷雾重重，无法解读。";
-            
-            // 新的 HTML 结构：移除 Icon，增加 Title-Group 和 Sub-Title
+            // 安全解构，防止 AI 偶尔漏字段
+            const roman = data.id || "XXI";
+            const title = data.title || "未知";
+            const enTitle = data.enTitle || ""; // AI 没生成英文就留空
+            const desc = data.desc || "......";
+
             overlay.innerHTML = `
                 <div class="title-group">
                     <div class="roman-num">${roman}</div>
@@ -510,14 +515,16 @@
             if(card.classList.contains('flipped')) return;
             activeFlippedCard = card; 
             mainBg.style.opacity = '0.3'; 
+            
             document.querySelectorAll('.chosen').forEach(c => {
                 if(c !== card) { c.style.opacity = 0; c.style.pointerEvents = 'none'; }
             });
 
+            // 判断逻辑：有结果就显示，没结果就 Loading
             if (pendingAiResult) {
                 renderCardContent(card, pendingAiResult);
             } else {
-                // Loading 状态也同步移除 Icon
+                // Loading 状态：纯粹的等待
                 const overlay = card.querySelector('.content-overlay');
                 const frontFace = card.querySelector('.face.front');
                 overlay.innerHTML = `
@@ -526,7 +533,7 @@
                         <h3>连接中</h3>
                         <div class="sub-title">CONNECTING</div>
                     </div>
-                    <p style="text-align:center">正在接收来自深空的信号...</p>
+                    <p style="text-align:center">正在建立量子链接...</p>
                 `;
                 frontFace.classList.add('loaded');
             }
@@ -536,5 +543,6 @@
 </body>
 
 </html>
+
 
 
