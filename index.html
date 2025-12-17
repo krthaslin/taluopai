@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V25 MAGIC CIRCLE</title>
+    <title>DESTINY PROTOCOL V26 DEBUG</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,101 +41,75 @@
             z-index: -1;
         }
 
+        /* --- 调试条样式 (新增) --- */
+        #debug-bar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            height: auto; max-height: 150px;
+            background: rgba(0, 0, 0, 0.85); 
+            color: #00ff00; /* 黑客绿 */
+            font-family: monospace; font-size: 10px; line-height: 1.2;
+            padding: 8px; z-index: 10000;
+            border-bottom: 1px solid #00ff00;
+            overflow-y: scroll;
+            word-wrap: break-word; white-space: pre-wrap;
+            display: block; /* 默认显示 */
+        }
+
         /* UI层 */
         .intro-layer { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; width: 100%; transition: opacity 0.8s; }
         
-        /* --- 修改点 3：全新的旋转魔法阵 --- */
+        /* 魔法阵样式 */
         .magic-circle {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            position: relative;
-            margin-bottom: 40px;
-            /* 外圈：紫色光晕和虚线 */
-            border: 2px dashed var(--neon);
-            box-shadow: 0 0 30px var(--neon), inset 0 0 20px var(--neon);
+            width: 160px; height: 160px; border-radius: 50%; position: relative; margin-bottom: 40px;
+            border: 2px dashed var(--neon); box-shadow: 0 0 30px var(--neon), inset 0 0 20px var(--neon);
             display: flex; justify-content: center; align-items: center;
             animation: rotateCircleSlow 20s linear infinite;
             background: radial-gradient(circle, transparent 60%, rgba(157, 0, 255, 0.2));
         }
-
-        /* 中圈：金色符文圈 (反向旋转) */
         .magic-circle::before {
-            content: ''; position: absolute;
-            width: 85%; height: 85%;
-            border-radius: 50%;
-            border: 1px solid var(--gold);
-            /* 使用复杂的边框模拟符文刻度 */
-            border-top: 3px double var(--gold);
-            border-bottom: 3px double var(--gold);
-            box-shadow: inset 0 0 15px var(--gold-dim);
-            animation: rotateCircleFast 12s linear infinite reverse;
+            content: ''; position: absolute; width: 85%; height: 85%; border-radius: 50%;
+            border: 1px solid var(--gold); border-top: 3px double var(--gold); border-bottom: 3px double var(--gold);
+            box-shadow: inset 0 0 15px var(--gold-dim); animation: rotateCircleFast 12s linear infinite reverse;
         }
-
-        /* 内核：能量核心 (脉冲) */
         .magic-circle::after {
-            content: ''; position: absolute;
-            width: 40%; height: 40%;
-            border-radius: 50%;
+            content: ''; position: absolute; width: 40%; height: 40%; border-radius: 50%;
             background: radial-gradient(circle at center, var(--gold), var(--neon) 70%, transparent);
             box-shadow: 0 0 20px var(--gold), 0 0 40px var(--neon);
             animation: pulseCore 2s ease-in-out infinite alternate;
         }
-
-        /* 魔法阵动画定义 */
         @keyframes rotateCircleSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateCircleFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulseCore { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
-        /* ---------------------------------- */
-
 
         .input-group { width: 280px; text-align: center; }
         
         input { 
             width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3); 
-            /* --- 修改点 1：圆角收敛 --- */
-            border-radius: 10px; 
-            color: var(--gold); padding: 15px 0; text-align: center; outline: none; margin-bottom: 25px; font-family: 'Noto Serif SC', serif; 
+            border-radius: 10px; color: var(--gold); padding: 15px 0; text-align: center; outline: none; margin-bottom: 25px; font-family: 'Noto Serif SC', serif; 
         }
         
         button { 
             background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 40px; 
-            /* --- 修改点 1 & 2：圆角收敛，文字加大 --- */
-            border-radius: 10px; 
-            font-size: 18px;
-            font-family: 'Noto Serif SC', serif; font-weight: 700; 
+            border-radius: 10px; font-size: 18px; font-family: 'Noto Serif SC', serif; font-weight: 700; 
         }
 
         /* 3D 舞台 */
         .vortex-container { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; pointer-events: none; display: flex; justify-content: center; align-items: center; }
         .card-ring { position: absolute; transform-style: preserve-3d; transition: transform 2s ease-out; }
 
-        /* 卡片基础 */
         .tarot-card {
-            position: absolute;
-            width: var(--card-w); height: var(--card-h);
+            position: absolute; width: var(--card-w); height: var(--card-h);
             left: calc(var(--card-w) / -2); top: calc(var(--card-h) / -2);
             border-radius: 8px; transform-style: preserve-3d;
-            transition: transform 1s, opacity 1s;
-            background-color: #222;
+            transition: transform 1s, opacity 1s; background-color: #222;
         }
 
-        .face {
-            position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 8px;
-            overflow: hidden; 
-            transition: background-image 0.3s;
-        }
-
-        .face.back {
-            background-color: #111; border: 1px solid #444;
-            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%), linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%);
-            background-position: 0 0, 10px 10px; background-size: 20px 20px; background-repeat: repeat;
-        }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; overflow: hidden; transition: background-image 0.3s; }
+        .face.back { background-color: #111; border: 1px solid #444; background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%), linear-gradient(45deg, rgba(197, 160, 89, 0.08) 25%, transparent 25%, transparent 75%, rgba(197, 160, 89, 0.08) 75%); background-position: 0 0, 10px 10px; background-size: 20px 20px; background-repeat: repeat; }
         .face.back.has-skin { background-size: cover !important; background-repeat: no-repeat !important; border: none; }
         .face.front { transform: rotateY(180deg); background-color: #000; background-size: cover; background-position: center; }
 
-        /* --- V21 字体排版系统 (Typography System) --- */
+        /* --- V21 字体排版系统 --- */
         .content-overlay {
             background: rgba(0, 0, 0, 0.85);
             width: 100%; height: 100%;
@@ -144,95 +118,43 @@
             opacity: 0; transition: opacity 0.5s;
             box-shadow: inset 0 0 0 1px var(--gold-dim);
             outline: 1px solid rgba(212, 175, 55, 0.6);
-            /* 电脑端默认 */
+            /* 修改点 1：圆角增加，解决四角溢出感 */
+            border-radius: 12px; 
             padding: 20px;
         }
         .face.front.loaded .content-overlay { opacity: 1; }
 
-        /* 电脑端排版 */
         .title-group { text-align: center; margin-bottom: 20px; width: 100%; border-bottom: 1px solid var(--gold-dim); padding-bottom: 10px; }
         .roman-num { font-family: 'Cinzel', serif; color: var(--gold-dim); font-size: 10px; display: block; margin-bottom: 5px; }
         .main-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 2px; }
         .sub-title { font-family: 'Cinzel', serif; color: #888; font-size: 8px; margin-top: 5px; display: block; letter-spacing: 1px; }
         .desc-text { color: #ddd; font-size: 10px; line-height: 1.8; text-align: justify; margin: 0; padding-top: 10px; }
 
-        /* --- 手机端排版重构 (Mobile Typography Fix) --- */
+        /* 手机端排版 */
         @media (max-width: 768px) {
-            .content-overlay { 
-                padding: 12px; /* 边距适中 */
-                outline-offset: -4px; 
-            }
-
-            .title-group {
-                margin-bottom: 8px;
-                padding-bottom: 6px;
-                border-bottom-width: 0.5px;
-            }
-
-            /* 技巧：不要写 3px, 4px，写大一点然后 scale 下去，保证清晰 */
-            .roman-num { 
-                font-size: 6px; 
-                margin-bottom: 2px; 
-                opacity: 0.8;
-            }
-
-            /* 标题：必须显著大 */
-            .main-title { 
-                font-size: 12px; /* 放大后约 31px，足够醒目 */
-                line-height: 1.2;
-                letter-spacing: 1px;
-            }
-
-            /* 英文：必须显著小 */
-            .sub-title {
-                font-size: 4px; /* 放大后约 10px */
-                margin-top: 2px;
-                opacity: 0.6;
-            }
-
-            /* 正文：黄金比例 */
-            .desc-text {
-                font-size: 5px; /* 放大后约 13px，阅读舒适 */
-                line-height: 1.6;
-                color: #ececec;
-            }
+            .content-overlay { padding: 12px; outline-offset: -4px; border-radius: 10px; }
+            .title-group { margin-bottom: 8px; padding-bottom: 6px; border-bottom-width: 0.5px; }
+            .roman-num { font-size: 6px; margin-bottom: 2px; opacity: 0.8; }
+            .main-title { font-size: 12px; line-height: 1.2; letter-spacing: 1px; }
+            .sub-title { font-size: 4px; margin-top: 2px; opacity: 0.6; }
+            .desc-text { font-size: 5px; line-height: 1.6; color: #ececec; }
         }
 
-        /* 动画与交互 */
         .tarot-card.vanish { opacity: 0; transform: translate3d(0, 500px, -1000px) rotateX(45deg) !important; }
         .tarot-card.chosen { pointer-events: auto; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s; z-index: 999; }
-        
         .tarot-card.flipped { z-index: 1000 !important; box-shadow: 0 0 100px var(--neon); transform: translate3d(0, 0, 400px) rotateY(180deg) scale(1.5) !important; }
-        @media (max-width: 768px) {
-            .tarot-card.flipped { transform: translate3d(0, 0, 220px) rotateY(180deg) scale(2.6) !important; }
-        }
-
+        @media (max-width: 768px) { .tarot-card.flipped { transform: translate3d(0, 0, 220px) rotateY(180deg) scale(2.6) !important; } }
         .hidden { opacity: 0; pointer-events: none; }
-
-        /* 错误弹窗 */
-        #error-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 99999;
-            display: none; justify-content: center; align-items: center;
-            flex-direction: column; padding: 20px;
-        }
-        #error-text { color: red; font-family: monospace; font-size: 12px; background: #111; padding: 10px; border: 1px solid red; width: 100%; overflow: scroll; height: 50%; }
-        #close-err { margin-top: 20px; padding: 10px 30px; background: white; color: black; border: none; }
     </style>
 </head>
 <body>
 
-    <div id="error-modal">
-        <h3 style="color:white">API 连接失败</h3>
-        <div id="error-text"></div>
-        <button id="close-err" onclick="document.getElementById('error-modal').style.display='none'">关闭并重试</button>
-    </div>
+    <div id="debug-bar">DEBUG CONSOLE: WAITING FOR INPUT...</div>
 
     <div class="bg-gradient" id="main-bg"></div>
 
     <div class="intro-layer" id="intro-ui">
         <div class="magic-circle"></div>
-        
         <div class="input-group">
             <input type="text" id="user-input" placeholder="输入所求之事..." autocomplete="off">
             <button onclick="startRitual()">开启法阵</button>
@@ -243,10 +165,11 @@
         <div class="card-ring" id="card-ring"></div>
     </div>
 
-<script>
+    <script>
         const cardRing = document.getElementById('card-ring');
         const introUi = document.getElementById('intro-ui');
         const mainBg = document.getElementById('main-bg');
+        const debugBar = document.getElementById('debug-bar'); // 获取调试条
         const isMobile = window.innerWidth < 768;
         const TOTAL_CARDS = isMobile ? 12 : 24; 
         
@@ -254,20 +177,19 @@
         let pendingAiResult = null; 
         let activeFlippedCard = null; 
 
-        // 你的图片资源
         const SKINS = {
             MOON: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png", 
             STAR: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png", 
             SUN:  "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png"  
         };
 
-        // ⭐️ 改动1：移除丑陋的错误弹窗，改用 Console 输出
-        function showError(msg) {
-            console.error("系统错误:", msg);
-            // 这里不再弹窗，而是让卡片显示错误信息，体验更好
+        // 辅助函数：写日志到顶部
+        function logDebug(msg) {
+            debugBar.innerText = ">> " + msg + "\n" + debugBar.innerText;
         }
 
         async function preFetchAiResult(query) {
+            logDebug("发送请求: " + query);
             try {
                 const response = await fetch('/api/tarot', {
                     method: 'POST',
@@ -278,49 +200,53 @@
                 const jsonResp = await response.json();
 
                 if (response.status !== 200) {
-                    throw new Error(`服务异常 (${response.status})`);
+                    throw new Error(`API 报错: ${jsonResp.error || '未知错误'}`);
                 }
 
-                // 优先取后端清洗好的 result
-                let finalData = jsonResp.result;
+                // 核心：如果有 raw 数据，显示在顶部
+                if (jsonResp.debug_raw) {
+                    logDebug("【AI 原始返回】:\n" + jsonResp.debug_raw);
+                }
 
-                // ⭐️ 改动2：终极容错
-                // 如果后端都没洗干净（极低概率），前端最后再试一次
+                let finalData = jsonResp.result || jsonResp;
+
+                // 补救解析
                 if (!finalData || !finalData.title) {
                     if (jsonResp.debug_raw) {
-                        try {
-                            const raw = jsonResp.debug_raw;
-                            const match = raw.match(/\{[\s\S]*\}/);
-                            if(match) finalData = JSON.parse(match[0]);
-                        } catch(e) {
-                            console.warn("前端补救解析也失败了");
+                        const raw = jsonResp.debug_raw;
+                        const start = raw.indexOf('{');
+                        const end = raw.lastIndexOf('}');
+                        if (start !== -1 && end !== -1) {
+                            try {
+                                finalData = JSON.parse(raw.substring(start, end + 1));
+                                logDebug("前端补救解析成功！");
+                            } catch(e) {
+                                logDebug("前端补救解析失败！");
+                            }
                         }
                     }
                 }
 
-                // 还没数据？那就说明这次请求彻底废了
                 if (!finalData || !finalData.title) {
-                    throw new Error("无效的命运回响");
+                    throw new Error("无法提取 JSON");
                 }
 
                 pendingAiResult = finalData;
+                logDebug("解析成功: " + finalData.title);
 
-                // 如果卡片已经翻开，立刻刷新内容
                 if (activeFlippedCard) {
                     renderCardContent(activeFlippedCard, finalData);
                 }
 
             } catch (e) {
-                showError(e.message);
+                console.error(e);
+                logDebug("ERROR: " + e.message);
                 
-                // ⭐️ 改动3：优雅降级
-                // 不弹报错框，而是生成一张“故障卡牌”
-                // 这让错误看起来像是一种神秘的“信号干扰”效果
                 pendingAiResult = {
                     id: "ERR",
-                    title: "信号干扰",
-                    enTitle: "SIGNAL INTERRUPTED",
-                    desc: "灵界信号微弱，无法解析。请重新尝试连接..."
+                    title: "连接中断",
+                    enTitle: "CONNECTION LOST",
+                    desc: "命运的信号被干扰，请稍后重试。"
                 };
                 if (activeFlippedCard) renderCardContent(activeFlippedCard, pendingAiResult);
             }
@@ -328,7 +254,7 @@
 
         function startRitual() {
             const query = document.getElementById('user-input').value;
-            if(!query) return alert("请输入心中的疑惑...");
+            if(!query) return alert("心诚则灵...");
             introUi.classList.add('hidden');
             preFetchAiResult(query);
             generateVortex();
@@ -400,7 +326,6 @@
             const overlay = card.querySelector('.content-overlay');
             const frontFace = card.querySelector('.face.front');
             
-            // 安全解构，防止 undefined 报错
             const roman = data.id || "??";
             const title = data.title || "未知";
             const enTitle = data.enTitle || "";
@@ -443,4 +368,3 @@
     </script>
 </body>
 </html>
-
