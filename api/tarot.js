@@ -7,11 +7,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server configuration error: No API Key' });
+    return res.status(500).json({ error: 'No API Key found' });
   }
 
   try {
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
+    const response = await fetch('[https://api.deepseek.com/chat/completions](https://api.deepseek.com/chat/completions)', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -19,38 +19,37 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
+        // 关键修改：调高温度，增加随机性
+        temperature: 1.3, 
         messages: [
           {
             role: "system",
-            content: "你是一位赛博塔罗师。请根据用户问题抽取一张塔罗牌。必须返回严格的JSON格式：{\"id\": \"罗马数字(如XIV)\", \"title\": \"中文牌名\", \"enTitle\": \"英文牌名(全大写)\", \"desc\": \"50字以内的深邃解读\"}。不要由多余字符。"
+            // 关键修改：强硬的 System Prompt，禁止输出 Markdown，防止解析失败
+            content: "你是一位赛博塔罗师。根据用户问题抽一张塔罗牌。必须返回纯净的JSON字符串，严禁使用markdown格式（即不要写```json）。格式：{\"id\": \"罗马数字\", \"title\": \"牌名\", \"enTitle\": \"英文牌名全大写\", \"desc\": \"50字以内解读\"}。"
           },
           {
             role: "user",
-            content: `求问者心中的疑惑是：${query}`
+            content: `求问者：${query}。请给出指引。`
           }
         ],
+        // 强制 JSON 模式（双重保险）
         response_format: { type: "json_object" }
       })
     });
 
     if (!response.ok) {
-        throw new Error(`DeepSeek API Error: ${response.statusText}`);
+        const err = await response.text();
+        throw new Error(`DeepSeek Error: ${response.status} - ${err}`);
     }
 
     const data = await response.json();
-    
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error('AI returned empty response');
-    }
-
     const aiContent = data.choices[0].message.content;
-    const tarotResult = JSON.parse(aiContent);
-
-    res.status(200).json(tarotResult);
+    
+    // 发回给前端
+    res.status(200).json({ raw: aiContent });
 
   } catch (error) {
-    console.error('Oracle Error:', error);
-    // 这里不再返回假数据，直接返回错误状态，前端会一直显示 Loading 或报错
-    res.status(500).json({ error: 'Connection Lost' });
+    console.error('API Fail:', error);
+    res.status(500).json({ error: error.message });
   }
 }
