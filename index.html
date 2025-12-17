@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.3 SPIRIT</title>
+    <title>DESTINY PROTOCOL V4.4 FINAL RESPONSIVE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,14 +23,34 @@
             left: 0; top: 0; right: 0; bottom: 0;
         }
 
+        /* --- 变量定义 (响应式核心) --- */
         :root {
             --gold: #d4af37;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
-            --card-w-mobile: 80px; 
-            --card-h-mobile: 140px;
+            
+            /* 默认移动端尺寸 */
+            --card-w: 80px; 
+            --card-h: 140px;
             --card-w-zoom: 240px;
             --card-h-zoom: 420px;
+            --storm-card-w: 60px;
+            --storm-card-h: 100px;
+        }
+
+        /* 桌面端/大屏适配 (>768px) */
+        @media (min-width: 768px) {
+            :root {
+                /* 放大卡槽和牌堆尺寸 */
+                --card-w: 150px; 
+                --card-h: 260px;
+                /* 放大聚焦尺寸 */
+                --card-w-zoom: 360px;
+                --card-h-zoom: 630px;
+                /* 放大龙卷风卡片尺寸 */
+                --storm-card-w: 100px;
+                --storm-card-h: 160px;
+            }
         }
 
         .bg-gradient {
@@ -88,10 +108,9 @@
             animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风 (修改点 1：位置下移) */
+        /* 龙卷风 */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%;
-            /* 增加 top 偏移，让中心点下沉 */
             top: 15%; 
             left: 0; pointer-events: none;
             transform-style: preserve-3d;
@@ -99,7 +118,9 @@
             z-index: 15;
         }
         .storm-card {
-            position: absolute; width: 60px; height: 100px;
+            /* 使用变量，响应式调整大小 */
+            width: var(--storm-card-w); height: var(--storm-card-h);
+            position: absolute;
             background: #111; border: 1px solid var(--gold); border-radius: 4px;
             background-image: linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%), 
                               linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%);
@@ -110,9 +131,13 @@
 
         /* 牌堆 */
         .deck-stack {
-            position: absolute; width: 80px; height: 140px;
-            top: 55%; 
-            left: 50%; margin-left: -40px; margin-top: -70px;
+            /* 使用变量，响应式调整大小 */
+            width: var(--card-w); height: var(--card-h);
+            position: absolute; 
+            top: 55%; left: 50%; 
+            /* 动态计算负边距以居中 */
+            margin-left: calc(var(--card-w) / -2); 
+            margin-top: calc(var(--card-h) / -2);
             z-index: 25; pointer-events: none; opacity: 0; 
             transition: opacity 1.5s ease-in;
         }
@@ -165,8 +190,14 @@
             padding-top: 10px;
             opacity: 0; pointer-events: none; transition: opacity 1s;
         }
+        /* 桌面端卡槽区增加底部留白 */
+        @media (min-width: 768px) {
+            .slots-container { padding-bottom: 40px; align-items: flex-end; }
+        }
+
         .slot {
-            width: var(--card-w-mobile); height: var(--card-h-mobile);
+            /* 使用变量，响应式调整大小 */
+            width: var(--card-w); height: var(--card-h);
             border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px;
             position: relative;
         }
@@ -178,7 +209,8 @@
 
         /* 动画元素 */
         .flying-card {
-            position: fixed; width: var(--card-w-mobile); height: var(--card-h-mobile);
+            /* 使用变量，响应式调整大小 */
+            position: fixed; width: var(--card-w); height: var(--card-h);
             border-radius: 6px; transform-style: preserve-3d;
             transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 50; cursor: pointer;
@@ -197,10 +229,11 @@
             box-shadow: inset 0 0 0 1px var(--gold-dim);
         }
         
+        /* (修改点 1：直角化) */
         .front-content {
             padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
             border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px);
-            border-radius: 0 0 2px 2px; 
+            border-radius: 0; /* 直角 */
         }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
@@ -268,7 +301,6 @@
         }
         window.addEventListener('load', lockViewportHeight);
 
-        // (修改点 3：恋人图片修复)
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
@@ -357,14 +389,12 @@
                 card.className = 'storm-card';
                 tornadoCon.appendChild(card);
                 
-                // 随机初始参数
                 const t = {
                     el: card,
                     angle: (i / 36) * 360,
                     y: (Math.random() - 0.5) * 600,
                     radius: 120 + Math.random() * 150,
-                    baseSpeed: 2 + Math.random() * 3, // 基础速度
-                    speed: 0
+                    speed: 2 + Math.random() * 3
                 };
                 state.tornadoCards.push(t);
                 
@@ -373,18 +403,15 @@
             animateTornado();
         }
 
-        // (修改点 2：变速呼吸律动)
         function animateTornado() {
             if (!state.shuffling) return;
             
-            // 使用正弦波模拟呼吸律动 (0.5x ~ 1.5x)
             const time = Date.now() / 1000;
-            const wave = Math.sin(time * 2); // 2是频率
+            const wave = Math.sin(time * 2); 
             const speedMultiplier = 1 + (wave * 0.5); 
 
             state.tornadoCards.forEach(t => {
-                // 动态调整速度
-                const currentSpeed = t.baseSpeed * speedMultiplier;
+                const currentSpeed = t.speed * speedMultiplier;
                 t.angle += currentSpeed;
                 t.el.style.transform = `translateY(${t.y}px) rotateY(${t.angle}deg) translateZ(${t.radius}px)`;
             });
