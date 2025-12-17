@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.7 FINAL</title>
+    <title>DESTINY PROTOCOL V4.9 FIXED</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,7 @@
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
             
-            /* 默认移动端尺寸 */
+            /* 移动端尺寸 */
             --card-w: 80px; 
             --card-h: 140px;
             --card-w-zoom: 240px;
@@ -124,7 +124,7 @@
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
-        /* 牌堆 */
+        /* 牌堆 (保持不动) */
         .deck-stack {
             width: var(--card-w); height: var(--card-h);
             position: absolute; 
@@ -141,14 +141,23 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* 输入区 */
+        /* --- 修正点 1：输入/提示文字区 --- */
         .controls-wrapper {
             position: absolute; 
+            /* 手机默认高度 */
             top: 72%; 
             width: 100%; display: flex; flex-direction: column; align-items: center;
             transition: all 0.5s ease;
             z-index: 30;
         }
+
+        /* 电脑端特调：强制下移到 85%，避开变大的牌堆 */
+        @media (min-width: 768px) {
+            .controls-wrapper {
+                top: 85%;
+            }
+        }
+
         .input-box {
             width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
             border-radius: 8px; color: var(--gold); padding: 12px; text-align: center; outline: none; 
@@ -159,24 +168,16 @@
             height: 20px; transition: opacity 0.3s; text-shadow: 0 2px 4px black;
         }
 
-        /* --- 顶部结果 (修改点：位置下沉，避免贴顶) --- */
+        /* --- 修正点 2：命运回响 (视觉正中心) --- */
         .final-display {
             position: absolute; 
             width: 85%; max-width: 600px;
             text-align: center; opacity: 0; pointer-events: none;
             transition: opacity 1s ease; z-index: 30;
             
-            /* 手机默认位置：下沉到 35% */
-            top: 35%; 
-        }
-        
-        /* 电脑端位置特调 */
-        @media (min-width: 768px) {
-            .final-display {
-                /* 电脑端下沉到 45% (接近屏幕中心略偏上) */
-                top: 45%; 
-                transform: translateY(-50%);
-            }
+            /* 绝对居中：相对于 stage-area 的中心 */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .final-title { 
@@ -236,7 +237,7 @@
         .front-content {
             padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
             border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px);
-            border-radius: 0;
+            border-radius: 0; /* 直角 */
         }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
@@ -388,7 +389,7 @@
             state.tornadoCards = [];
             
             const isDesktop = window.innerWidth > 768;
-            // 修正：电脑版从 120 降至 60
+            // 电脑端 60 张，手机端 36 张
             const count = isDesktop ? 60 : 36; 
             const yRange = isDesktop ? 1000 : 600; 
             const rBase = isDesktop ? 350 : 120;   
@@ -456,6 +457,8 @@
                 statusText.style.color = "#888";
                 statusText.innerText = "命运已定。请依次点击牌堆，抽取过去、现在、未来。";
                 statusText.style.opacity = 1;
+                
+                // 恢复输入框区域显示（仅显示提示语）
                 controls.style.opacity = 1;
                 inputBox.style.display = 'none';
             }, 800);
