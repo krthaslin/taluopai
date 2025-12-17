@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Allow CORS for debugging
+  // 允许跨域，方便调试
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST');
 
@@ -24,16 +24,16 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        temperature: 1.3, // High creativity
+        temperature: 1.3, // 高创造性，让解读更丰富
         messages: [
           {
             role: "system",
-            // Stricter prompt
-            content: "You are a Tarot Reader. Output ONLY a valid JSON object. No markdown, no conversational text. Format: {\"id\": \"Roman Numeral\", \"title\": \"Card Name\", \"enTitle\": \"English Name\", \"desc\": \"Reading under 50 words\"}."
+            // --- 核心修改：全中文 Prompt ---
+            content: "你是一位精通命运的塔罗师。请根据用户的问题抽一张牌，并给予深邃的指引。必须返回纯净的 JSON 格式，严禁包含 Markdown 标记或其他废话。返回格式：{\"id\": \"罗马数字(如 X, XII)\", \"title\": \"中文牌名\", \"enTitle\": \"英文牌名(全大写)\", \"desc\": \"50字以内的中文解读，语气神秘且富有哲理\"}。"
           },
           {
             role: "user",
-            content: `Question: ${query}`
+            content: `求问者心中的疑惑是：${query}`
           }
         ],
         response_format: { type: "json_object" }
@@ -47,8 +47,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     const rawContent = data.choices[0].message.content;
     
-    // --- Surgical JSON Extraction ---
-    // This ignores everything before the first '{' and after the last '}'
+    // --- 外科手术式 JSON 提取 (保持不变，这层保险很有用) ---
     const jsonStartIndex = rawContent.indexOf('{');
     const jsonEndIndex = rawContent.lastIndexOf('}');
     
@@ -65,7 +64,7 @@ export default async function handler(req, res) {
         throw new Error("JSON Parse Failed: " + cleanContent);
     }
 
-    // Send back result AND debug info
+    // 返回结果
     res.status(200).json({
         result: parsedData,
         debug_raw: rawContent, 
