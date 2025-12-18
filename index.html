@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.5 FINAL</title>
+    <title>DESTINY PROTOCOL V5.6 FINAL TUNED</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -265,32 +265,66 @@
             text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
         }
 
-        /* --- 修改点：神性判词样式 (V5.5) --- */
+        /* --- 修改点：神性判词样式 (V5.6) --- */
         .final-display {
             position: absolute; width: 85%; max-width: 600px;
             text-align: center; opacity: 0; pointer-events: none; transition: opacity 1s ease; 
             z-index: 30; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
 
-        /* 判词标题：流光金 + Cinzel Decorative + 破折号 */
+        /* 判词标题：流光金 + Cinzel Decorative + CSS细线 */
         .final-title { 
             font-family: 'Cinzel Decorative', cursive;
-            /* 修改点：字号缩小 */
+            /* 手机端默认 18px */
             font-size: 18px; 
-            /* 修改点：字距拉大 */
-            letter-spacing: 15px; 
+            /* 移除大的字距，改用Flex布局对齐线条 */
+            letter-spacing: 2px;
             margin-bottom: 25px; 
             font-weight: 700;
-            /* 修正字距导致的右侧留白 */
-            margin-right: -15px;
             
-            /* 流光特效 */
+            /* Flex 布局让线条和文字居中对齐 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* 线条和文字的间距 */
+            
+            /* 流光特效 (作用于文字) */
             background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shine 4s linear infinite;
         }
+
+        /* 电脑端字号稍微大一点点 */
+        @media (min-width: 768px) {
+            .final-title {
+                font-size: 24px;
+            }
+        }
+
+        /* 使用伪元素绘制细横线 */
+        .final-title::before,
+        .final-title::after {
+            content: '';
+            display: block;
+            /* 手机端长度 */
+            width: 30px; 
+            /* 极细高度 */
+            height: 1px; 
+            /* 金色背景，带一点透明度 */
+            background: #d4af37;
+            opacity: 0.6;
+        }
+        
+        /* 电脑端线条加长 */
+        @media (min-width: 768px) {
+            .final-title::before,
+            .final-title::after {
+                width: 60px;
+            }
+        }
+
 
         /* 判词内文：月光金 + 经文排版 */
         .final-text { 
@@ -395,7 +429,7 @@
         </div>
 
         <div class="final-display" id="final-con">
-            <div class="final-title">—— 命运回响 ——</div>
+            <div class="final-title">命运回响</div>
             <div class="final-text" id="ai-text"></div>
         </div>
     </div>
@@ -425,7 +459,7 @@
         window.addEventListener('load', () => {
             lockViewport();
             
-            // 修改点：开屏停留 2 秒
+            // 开屏停留 2 秒
             setTimeout(() => {
                 const introLayer = document.getElementById('intro-layer');
                 introLayer.style.opacity = '0';
