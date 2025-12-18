@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.4 FINAL</title>
+    <title>DESTINY PROTOCOL V5.5 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -265,20 +265,24 @@
             text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
         }
 
-        /* --- 修改点：神性判词样式 --- */
+        /* --- 修改点：神性判词样式 (V5.5) --- */
         .final-display {
             position: absolute; width: 85%; max-width: 600px;
             text-align: center; opacity: 0; pointer-events: none; transition: opacity 1s ease; 
             z-index: 30; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
 
-        /* 判词标题：流光金 + Cinzel Decorative */
+        /* 判词标题：流光金 + Cinzel Decorative + 破折号 */
         .final-title { 
             font-family: 'Cinzel Decorative', cursive;
-            font-size: 24px; 
-            letter-spacing: 6px; 
+            /* 修改点：字号缩小 */
+            font-size: 18px; 
+            /* 修改点：字距拉大 */
+            letter-spacing: 15px; 
             margin-bottom: 25px; 
             font-weight: 700;
+            /* 修正字距导致的右侧留白 */
+            margin-right: -15px;
             
             /* 流光特效 */
             background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
@@ -391,7 +395,7 @@
         </div>
 
         <div class="final-display" id="final-con">
-            <div class="final-title">✧ 命运回响 ✧</div>
+            <div class="final-title">—— 命运回响 ——</div>
             <div class="final-text" id="ai-text"></div>
         </div>
     </div>
@@ -421,7 +425,7 @@
         window.addEventListener('load', () => {
             lockViewport();
             
-            // 修改点：开屏停留 2.5 秒
+            // 修改点：开屏停留 2 秒
             setTimeout(() => {
                 const introLayer = document.getElementById('intro-layer');
                 introLayer.style.opacity = '0';
@@ -432,7 +436,7 @@
                 document.getElementById('top-brand').style.opacity = '1';
 
                 setTimeout(() => { introLayer.style.display = 'none'; }, 1500);
-            }, 2500);
+            }, 2000);
         });
 
         const TAROT_DATA = [
