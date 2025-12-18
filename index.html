@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.1 FIXED</title>
+    <title>DESTINY PROTOCOL V5.2 TUNED</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,14 +16,13 @@
         
         html, body { 
             margin: 0; padding: 0; width: 100%; 
-            /* 关键修改：高度由 JS 动态锁定，初始设为 100vh 作为兜底 */
+            /* 锁定高度，防止键盘弹出挤压页面 */
             height: 100vh; 
             overflow: hidden; 
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
             perspective: 1200px;
-            /* 禁止页面在移动端回弹 */
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         }
 
@@ -63,11 +62,9 @@
             position: relative;
             z-index: 100;
             pointer-events: none;
-            /* 居中处理 */
             align-items: center;
         }
 
-        /* 中文：流光 + 75%布局 */
         .cn-title {
             font-family: 'Noto Serif SC', serif;
             font-weight: 900; 
@@ -76,7 +73,6 @@
             margin: 0 auto;  
             margin-bottom: 6px;
             display: flex; justify-content: space-between; 
-
             background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
             background-size: 200% auto;
             -webkit-background-clip: text;
@@ -84,7 +80,6 @@
             animation: shine 4s linear infinite;
         }
 
-        /* 英文：原版样式 */
         .main-title {
             font-family: 'Cinzel Decorative', cursive;
             font-size: 42px;
@@ -97,109 +92,64 @@
             letter-spacing: 8px; 
             margin: 0; padding: 0;
             margin-right: -8px; 
-            white-space: nowrap; /* 防止换行 */
+            white-space: nowrap; 
         }
 
-        /* --- 修改点1：手机端标题优化 --- */
+        /* 手机端标题适配 */
         @media (max-width: 768px) {
-            .title-block {
-                width: 90vw; /* 限制总宽度为屏幕的90% */
-                max-width: 320px; /* 防止在折叠屏上太大 */
-            }
-            .main-title { 
-                font-size: 24px; /* 缩小字号 */
-                letter-spacing: 3px; 
-                margin-right: -3px; 
-            }
-            .cn-title { 
-                font-size: 11px; 
-                margin-bottom: 4px; 
-            }
+            .title-block { width: 90vw; max-width: 320px; }
+            .main-title { font-size: 24px; letter-spacing: 3px; margin-right: -3px; }
+            .cn-title { font-size: 11px; margin-bottom: 4px; }
         }
 
         @keyframes shine { to { background-position: 200% center; } }
 
         /* =========================================
-           POWERED BY 样式 (图文混排核心)
+           POWERED BY 样式 (精致小巧版)
            ========================================= */
         .powered-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px; /* 缩小间距 */
-            font-family: 'Cinzel Decorative', serif;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; font-family: 'Cinzel Decorative', serif;
         }
-
         .powered-text {
-            color: #d4af37; 
-            /* 修改点3：更精致小巧的字体 */
-            font-size: 9px; 
-            letter-spacing: 2px; 
-            text-transform: uppercase;
-            padding-top: 1px; 
-            opacity: 0.8;
+            color: #d4af37; font-size: 9px; letter-spacing: 2px; 
+            text-transform: uppercase; padding-top: 1px; opacity: 0.8;
         }
-
         .powered-logo-img {
-            /* 修改点3：更小的 Logo */
-            height: 12px; 
-            width: auto;
+            height: 12px; width: auto;
             filter: grayscale(100%) invert(1) brightness(1.2) sepia(1) hue-rotate(5deg) saturate(1.5);
             opacity: 0.8;
         }
 
         /* =========================================
-           场景控制 (Intro & Stage)
+           场景控制
            ========================================= */
-
         .intro-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050505; 
-            display: flex; flex-direction: column; 
+            background: #050505; display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
-            z-index: 2000;
-            transition: opacity 1.5s ease-in-out;
+            z-index: 2000; transition: opacity 1.5s ease-in-out;
         }
-
         .intro-logo-wrapper {
-            margin-top: 30px; 
-            opacity: 0.8;
-            animation: breathe 3s infinite ease-in-out;
+            margin-top: 30px; opacity: 0.8; animation: breathe 3s infinite ease-in-out;
         }
-        /* 开场时的 Logo 可以稍微大一点点，不用太小 */
         .intro-logo-wrapper .powered-logo-img { height: 16px; }
         .intro-logo-wrapper .powered-text { font-size: 10px; }
 
         /* 主舞台标题 */
         .stage-header-wrapper {
-            position: absolute;
-            /* 修改点2：使用固定像素定位，或者保持百分比但依赖锁定的body高度 */
-            top: 15%; 
-            width: 100%;
-            display: flex; justify-content: center;
-            z-index: 15;
-            opacity: 0; 
-            transition: opacity 2s ease;
-            transform: scale(0.7); 
+            position: absolute; top: 15%; width: 100%;
+            display: flex; justify-content: center; z-index: 15;
+            opacity: 0; transition: opacity 2s ease; transform: scale(0.7); 
         }
         @media (max-width: 768px) {
-            .stage-header-wrapper { 
-                /* 手机上稍微靠上一点，给输入框腾地方 */
-                top: 12%; 
-                transform: scale(1); /* 既然标题已经改小了，这里就不缩放了，保持清晰 */
-            }
+            .stage-header-wrapper { top: 12%; transform: scale(1); }
         }
 
-        /* --- 修改点3：常驻顶部 Logo (精致版) --- */
+        /* 常驻顶部 Logo */
         .top-brand {
-            position: fixed; 
-            top: 25px; /* 上移，更贴顶 */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2100; 
-            opacity: 0; 
-            transition: opacity 2s ease; 
-            pointer-events: none;
+            position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
+            z-index: 2100; opacity: 0; transition: opacity 2s ease; pointer-events: none;
         }
 
         @keyframes breathe {
@@ -208,7 +158,7 @@
         }
 
         /* =========================================
-           游戏逻辑 UI
+           游戏逻辑 UI (位置微调区)
            ========================================= */
         .stage-area {
             flex: 70; width: 100%;
@@ -216,12 +166,15 @@
             position: relative; z-index: 10;
         }
 
+        /* 修改点1：魔法阵上移 (拉开间距) */
         .magic-circle-container {
             position: absolute; 
             width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 20;
-            top: 55%; transform: translateY(-50%);
+            /* 核心修改：55% -> 45% */
+            top: 45%; 
+            transform: translateY(-50%);
             opacity: 0; transition: opacity 2s ease, transform 0.8s;
         }
         .magic-circle-container:active { transform: translateY(-50%) scale(0.95); }
@@ -235,8 +188,7 @@
         }
         .magic-circle.active {
             box-shadow: 0 0 80px var(--neon), inset 0 0 50px var(--neon);
-            border-color: #fff;
-            animation: rotateFast 0.5s linear infinite; 
+            border-color: #fff; animation: rotateFast 0.5s linear infinite; 
         }
         .magic-circle::before {
             content: ''; position: absolute; 
@@ -249,8 +201,7 @@
         .circle-hint {
             position: absolute; color: var(--gold); font-size: 14px; font-weight: bold;
             text-align: center; pointer-events: none; letter-spacing: 2px;
-            text-shadow: 0 0 10px black;
-            animation: pulseText 2s infinite;
+            text-shadow: 0 0 10px black; animation: pulseText 2s infinite;
         }
 
         .tornado-wrapper {
@@ -266,8 +217,11 @@
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
+        /* 修改点1：输入框下移 (拉开间距) */
         .controls-wrapper {
-            position: absolute; top: 72%; 
+            position: absolute; 
+            /* 核心修改：72% -> 76% */
+            top: 76%; 
             width: 100%; display: flex; flex-direction: column; align-items: center;
             z-index: 30; opacity: 0; transition: opacity 2s ease;
         }
@@ -296,10 +250,23 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
+        /* 修改点2：卡槽整体上移 */
         .slots-container {
             flex: 30; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-start;
             padding-top: 10px; opacity: 0; pointer-events: none; transition: opacity 1s;
+            /* 手机端微调上移 */
+            transform: translateY(-15px);
         }
+        
+        /* 电脑端大幅上移 */
+        @media (min-width: 768px) {
+            .slots-container { 
+                padding-bottom: 100px; /* 加大底部留白 */
+                align-items: flex-end; 
+                transform: translateY(-20px); /* 配合 padding 进一步上浮 */
+            }
+        }
+
         .slot {
             width: var(--card-w); height: var(--card-h);
             border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; position: relative;
@@ -414,17 +381,13 @@
     </div>
 
     <script>
-        // --- 修改点2：终极防抖动高度锁定逻辑 ---
+        // 终极防抖动高度锁定
         let lockedHeight = window.innerHeight;
         let lockedWidth = window.innerWidth;
 
         function lockViewport() {
-            // 第一次加载时锁定高度
             document.body.style.height = `${lockedHeight}px`;
-            
             window.addEventListener('resize', () => {
-                // 只有当宽度发生变化（比如横竖屏切换）时，才重新计算高度
-                // 如果仅仅是高度变了（键盘弹出），则无视，保持 body 高度不变
                 if (window.innerWidth !== lockedWidth) {
                     lockedWidth = window.innerWidth;
                     lockedHeight = window.innerHeight;
@@ -436,7 +399,6 @@
         window.addEventListener('load', () => {
             lockViewport();
             
-            // 1.5秒后开始转场
             setTimeout(() => {
                 const introLayer = document.getElementById('intro-layer');
                 introLayer.style.opacity = '0';
