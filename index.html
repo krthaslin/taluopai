@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL FINAL</title>
+    <title>DESTINY PROTOCOL V5.1 FIXED</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,12 +15,16 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100vh;
+            margin: 0; padding: 0; width: 100%; 
+            /* 关键修改：高度由 JS 动态锁定，初始设为 100vh 作为兜底 */
+            height: 100vh; 
             overflow: hidden; 
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
             perspective: 1200px;
+            /* 禁止页面在移动端回弹 */
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         }
 
         :root {
@@ -59,6 +63,8 @@
             position: relative;
             z-index: 100;
             pointer-events: none;
+            /* 居中处理 */
+            align-items: center;
         }
 
         /* 中文：流光 + 75%布局 */
@@ -91,11 +97,24 @@
             letter-spacing: 8px; 
             margin: 0; padding: 0;
             margin-right: -8px; 
+            white-space: nowrap; /* 防止换行 */
         }
 
+        /* --- 修改点1：手机端标题优化 --- */
         @media (max-width: 768px) {
-            .main-title { font-size: 28px; letter-spacing: 4px; margin-right: -4px; }
-            .cn-title { font-size: 12px; margin-bottom: 4px; }
+            .title-block {
+                width: 90vw; /* 限制总宽度为屏幕的90% */
+                max-width: 320px; /* 防止在折叠屏上太大 */
+            }
+            .main-title { 
+                font-size: 24px; /* 缩小字号 */
+                letter-spacing: 3px; 
+                margin-right: -3px; 
+            }
+            .cn-title { 
+                font-size: 11px; 
+                margin-bottom: 4px; 
+            }
         }
 
         @keyframes shine { to { background-position: 200% center; } }
@@ -105,34 +124,34 @@
            ========================================= */
         .powered-container {
             display: flex;
-            align-items: center; /* 垂直居中 */
+            align-items: center;
             justify-content: center;
-            gap: 8px; /* 文字和Logo之间的间距 */
+            gap: 6px; /* 缩小间距 */
             font-family: 'Cinzel Decorative', serif;
         }
 
         .powered-text {
             color: #d4af37; 
-            font-size: 10px; 
+            /* 修改点3：更精致小巧的字体 */
+            font-size: 9px; 
             letter-spacing: 2px; 
             text-transform: uppercase;
-            /* 与 Logo 视觉对齐 */
-            padding-top: 2px; 
+            padding-top: 1px; 
+            opacity: 0.8;
         }
 
         .powered-logo-img {
-            height: 16px; /* Logo 高度，与文字匹配 */
+            /* 修改点3：更小的 Logo */
+            height: 12px; 
             width: auto;
-            /* 金色滤镜 */
             filter: grayscale(100%) invert(1) brightness(1.2) sepia(1) hue-rotate(5deg) saturate(1.5);
-            opacity: 0.9;
+            opacity: 0.8;
         }
 
         /* =========================================
            场景控制 (Intro & Stage)
            ========================================= */
 
-        /* 1. 开场遮罩层 */
         .intro-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #050505; 
@@ -142,16 +161,19 @@
             transition: opacity 1.5s ease-in-out;
         }
 
-        /* 开场时的 Logo 位置 (位于英文名下方) */
         .intro-logo-wrapper {
             margin-top: 30px; 
             opacity: 0.8;
             animation: breathe 3s infinite ease-in-out;
         }
+        /* 开场时的 Logo 可以稍微大一点点，不用太小 */
+        .intro-logo-wrapper .powered-logo-img { height: 16px; }
+        .intro-logo-wrapper .powered-text { font-size: 10px; }
 
-        /* 2. 主舞台标题 */
+        /* 主舞台标题 */
         .stage-header-wrapper {
             position: absolute;
+            /* 修改点2：使用固定像素定位，或者保持百分比但依赖锁定的body高度 */
             top: 15%; 
             width: 100%;
             display: flex; justify-content: center;
@@ -161,17 +183,21 @@
             transform: scale(0.7); 
         }
         @media (max-width: 768px) {
-            .stage-header-wrapper { top: 12%; transform: scale(0.6); }
+            .stage-header-wrapper { 
+                /* 手机上稍微靠上一点，给输入框腾地方 */
+                top: 12%; 
+                transform: scale(1); /* 既然标题已经改小了，这里就不缩放了，保持清晰 */
+            }
         }
 
-        /* 3. 常驻顶部 Logo (Main Stage) - 屏幕顶部 */
+        /* --- 修改点3：常驻顶部 Logo (精致版) --- */
         .top-brand {
             position: fixed; 
-            top: 40px; /* 距顶部距离 */
+            top: 25px; /* 上移，更贴顶 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 2100; 
-            opacity: 0; /* 初始隐藏 */
+            opacity: 0; 
             transition: opacity 2s ease; 
             pointer-events: none;
         }
@@ -388,29 +414,39 @@
     </div>
 
     <script>
-        function lockViewportHeight() { document.body.style.height = window.innerHeight + 'px'; }
+        // --- 修改点2：终极防抖动高度锁定逻辑 ---
+        let lockedHeight = window.innerHeight;
+        let lockedWidth = window.innerWidth;
+
+        function lockViewport() {
+            // 第一次加载时锁定高度
+            document.body.style.height = `${lockedHeight}px`;
+            
+            window.addEventListener('resize', () => {
+                // 只有当宽度发生变化（比如横竖屏切换）时，才重新计算高度
+                // 如果仅仅是高度变了（键盘弹出），则无视，保持 body 高度不变
+                if (window.innerWidth !== lockedWidth) {
+                    lockedWidth = window.innerWidth;
+                    lockedHeight = window.innerHeight;
+                    document.body.style.height = `${lockedHeight}px`;
+                }
+            });
+        }
         
         window.addEventListener('load', () => {
-            lockViewportHeight();
+            lockViewport();
             
             // 1.5秒后开始转场
             setTimeout(() => {
                 const introLayer = document.getElementById('intro-layer');
-                
-                // 开场淡出
                 introLayer.style.opacity = '0';
                 
-                // 舞台元素淡入
                 document.getElementById('stage-header').style.opacity = '1';
                 document.getElementById('magic-trigger').style.opacity = '1';
                 document.getElementById('controls').style.opacity = '1';
-                
-                // 顶部常驻 Logo 淡入
                 document.getElementById('top-brand').style.opacity = '1';
 
-                // 销毁开场层
                 setTimeout(() => { introLayer.style.display = 'none'; }, 1500);
-
             }, 1500);
         });
 
