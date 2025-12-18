@@ -3,49 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V4.9 FIXED</title>
+    <title>DESTINY PROTOCOL FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@300;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- 基础设置 --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
-            margin: 0; padding: 0; width: 100%; 
+            margin: 0; padding: 0; width: 100%; height: 100vh;
             overflow: hidden; 
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
             display: flex; flex-direction: column; align-items: center;
             perspective: 1200px;
-            position: fixed;
-            left: 0; top: 0; right: 0; bottom: 0;
         }
 
         :root {
             --gold: #d4af37;
+            --gold-light: #fff8dc;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
+            --void-bg: #050505;
             
             /* 移动端尺寸 */
-            --card-w: 80px; 
-            --card-h: 140px;
-            --card-w-zoom: 240px;
-            --card-h-zoom: 420px;
-            --storm-card-w: 60px;
-            --storm-card-h: 100px;
+            --card-w: 80px; --card-h: 140px;
+            --card-w-zoom: 240px; --card-h-zoom: 420px;
+            --storm-card-w: 60px; --storm-card-h: 100px;
         }
 
-        /* 桌面端适配 (>768px) */
         @media (min-width: 768px) {
             :root {
-                --card-w: 150px; 
-                --card-h: 260px;
-                --card-w-zoom: 360px;
-                --card-h-zoom: 630px;
-                --storm-card-w: 100px;
-                --storm-card-h: 160px;
+                --card-w: 150px; --card-h: 260px;
+                --card-w-zoom: 360px; --card-h-zoom: 630px;
+                --storm-card-w: 100px; --storm-card-h: 160px;
             }
         }
 
@@ -55,25 +50,153 @@
             z-index: -1;
         }
 
-        /* --- 舞台区 --- */
-        .stage-area {
-            flex: 70; 
-            width: 100%;
+        /* =========================================
+           V3 视觉核心代码 (Title Block)
+           ========================================= */
+        .title-block {
             display: flex; flex-direction: column;
-            justify-content: center; 
-            align-items: center;
+            width: fit-content; 
+            position: relative;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* 中文：流光 + 75%布局 */
+        .cn-title {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 900; 
+            font-size: 16px; 
+            width: 75%;      
+            margin: 0 auto;  
+            margin-bottom: 6px;
+            display: flex; justify-content: space-between; 
+
+            background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+
+        /* 英文：原版样式 */
+        .main-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(180deg, #fff8dc 20%, #d4af37 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(157, 0, 255, 0.3), 0 0 10px rgba(212, 175, 55, 0.2);
+            letter-spacing: 8px; 
+            margin: 0; padding: 0;
+            margin-right: -8px; 
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 28px; letter-spacing: 4px; margin-right: -4px; }
+            .cn-title { font-size: 12px; margin-bottom: 4px; }
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* =========================================
+           POWERED BY 样式 (图文混排核心)
+           ========================================= */
+        .powered-container {
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            justify-content: center;
+            gap: 8px; /* 文字和Logo之间的间距 */
+            font-family: 'Cinzel Decorative', serif;
+        }
+
+        .powered-text {
+            color: #d4af37; 
+            font-size: 10px; 
+            letter-spacing: 2px; 
+            text-transform: uppercase;
+            /* 与 Logo 视觉对齐 */
+            padding-top: 2px; 
+        }
+
+        .powered-logo-img {
+            height: 16px; /* Logo 高度，与文字匹配 */
+            width: auto;
+            /* 金色滤镜 */
+            filter: grayscale(100%) invert(1) brightness(1.2) sepia(1) hue-rotate(5deg) saturate(1.5);
+            opacity: 0.9;
+        }
+
+        /* =========================================
+           场景控制 (Intro & Stage)
+           ========================================= */
+
+        /* 1. 开场遮罩层 */
+        .intro-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; 
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center;
+            z-index: 2000;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        /* 开场时的 Logo 位置 (位于英文名下方) */
+        .intro-logo-wrapper {
+            margin-top: 30px; 
+            opacity: 0.8;
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        /* 2. 主舞台标题 */
+        .stage-header-wrapper {
+            position: absolute;
+            top: 15%; 
+            width: 100%;
+            display: flex; justify-content: center;
+            z-index: 15;
+            opacity: 0; 
+            transition: opacity 2s ease;
+            transform: scale(0.7); 
+        }
+        @media (max-width: 768px) {
+            .stage-header-wrapper { top: 12%; transform: scale(0.6); }
+        }
+
+        /* 3. 常驻顶部 Logo (Main Stage) - 屏幕顶部 */
+        .top-brand {
+            position: fixed; 
+            top: 40px; /* 距顶部距离 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2100; 
+            opacity: 0; /* 初始隐藏 */
+            transition: opacity 2s ease; 
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+
+        /* =========================================
+           游戏逻辑 UI
+           ========================================= */
+        .stage-area {
+            flex: 70; width: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             position: relative; z-index: 10;
         }
 
-        /* 魔法阵 */
         .magic-circle-container {
             position: absolute; 
             width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 20;
-            transition: all 0.8s ease;
-            top: 55%; 
-            transform: translateY(-50%);
+            top: 55%; transform: translateY(-50%);
+            opacity: 0; transition: opacity 2s ease, transform 0.8s;
         }
         .magic-circle-container:active { transform: translateY(-50%) scale(0.95); }
 
@@ -104,59 +227,25 @@
             animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风 */
         .tornado-wrapper {
-            position: absolute; width: 100%; height: 100%;
-            top: 15%; 
-            left: 0; pointer-events: none;
-            transform-style: preserve-3d;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 15;
+            position: absolute; width: 100%; height: 100%; top: 15%; left: 0; 
+            pointer-events: none; transform-style: preserve-3d;
+            display: flex; justify-content: center; align-items: center; z-index: 15;
         }
         .storm-card {
             width: var(--storm-card-w); height: var(--storm-card-h);
             position: absolute;
             background: #111; border: 1px solid var(--gold); border-radius: 4px;
-            background-image: linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%), 
-                              linear-gradient(45deg, rgba(212, 175, 55, 0.15) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.15) 75%);
-            background-size: 10px 10px;
             box-shadow: 0 0 15px rgba(157, 0, 255, 0.3);
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
-        /* 牌堆 (保持不动) */
-        .deck-stack {
-            width: var(--card-w); height: var(--card-h);
-            position: absolute; 
-            top: 55%; left: 50%; 
-            margin-left: calc(var(--card-w) / -2); 
-            margin-top: calc(var(--card-h) / -2);
-            z-index: 25; pointer-events: none; opacity: 0; 
-            transition: opacity 1.5s ease-in;
-        }
-        .deck-card-static {
-            position: absolute; width: 100%; height: 100%;
-            background: #111; border: 1px solid var(--gold-dim); border-radius: 6px;
-            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
-            background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        /* --- 修正点 1：输入/提示文字区 --- */
         .controls-wrapper {
-            position: absolute; 
-            /* 手机默认高度 */
-            top: 72%; 
+            position: absolute; top: 72%; 
             width: 100%; display: flex; flex-direction: column; align-items: center;
-            transition: all 0.5s ease;
-            z-index: 30;
+            z-index: 30; opacity: 0; transition: opacity 2s ease;
         }
-
-        /* 电脑端特调：强制下移到 85%，避开变大的牌堆 */
-        @media (min-width: 768px) {
-            .controls-wrapper {
-                top: 85%;
-            }
-        }
+        @media (min-width: 768px) { .controls-wrapper { top: 85%; } }
 
         .input-box {
             width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
@@ -165,95 +254,65 @@
         }
         .status-text {
             margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px;
-            height: 20px; transition: opacity 0.3s; text-shadow: 0 2px 4px black;
+            height: 20px; text-shadow: 0 2px 4px black;
         }
 
-        /* --- 修正点 2：命运回响 (视觉正中心) --- */
+        .deck-stack {
+            width: var(--card-w); height: var(--card-h);
+            position: absolute; top: 55%; left: 50%; 
+            margin-left: calc(var(--card-w) / -2); margin-top: calc(var(--card-h) / -2);
+            z-index: 25; pointer-events: none; opacity: 0; transition: opacity 1.5s ease-in;
+        }
+        .deck-card-static {
+            position: absolute; width: 100%; height: 100%;
+            background: #111; border: 1px solid var(--gold-dim); border-radius: 6px;
+            background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
+            background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .slots-container {
+            flex: 30; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-start;
+            padding-top: 10px; opacity: 0; pointer-events: none; transition: opacity 1s;
+        }
+        .slot {
+            width: var(--card-w); height: var(--card-h);
+            border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; position: relative;
+        }
+        .slot::after {
+            content: attr(data-label); position: absolute; bottom: -25px; width: 100%; 
+            text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
+        }
+
         .final-display {
-            position: absolute; 
-            width: 85%; max-width: 600px;
-            text-align: center; opacity: 0; pointer-events: none;
-            transition: opacity 1s ease; z-index: 30;
-            
-            /* 绝对居中：相对于 stage-area 的中心 */
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            position: absolute; width: 85%; max-width: 600px;
+            text-align: center; opacity: 0; pointer-events: none; transition: opacity 1s ease; 
+            z-index: 30; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
-
-        .final-title { 
-            color: var(--neon); font-family: 'Cinzel'; font-size: 20px; letter-spacing: 6px; 
-            margin-bottom: 20px; text-shadow: 0 0 10px var(--neon);
-        }
+        .final-title { color: var(--neon); font-family: 'Cinzel'; font-size: 20px; letter-spacing: 6px; margin-bottom: 20px; }
         .final-text { 
             color: #eee; font-size: 15px; line-height: 1.8; text-align: justify; 
             background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px;
-            border: 1px solid rgba(157, 0, 255, 0.3);
-            backdrop-filter: blur(4px);
+            border: 1px solid rgba(157, 0, 255, 0.3); backdrop-filter: blur(4px);
         }
 
-        /* 卡槽区 */
-        .slots-container {
-            flex: 30; width: 100%;
-            display: flex; justify-content: space-evenly; align-items: flex-start;
-            padding-top: 10px;
-            opacity: 0; pointer-events: none; transition: opacity 1s;
-        }
-        @media (min-width: 768px) {
-            .slots-container { padding-bottom: 40px; align-items: flex-end; }
-        }
-
-        .slot {
-            width: var(--card-w); height: var(--card-h);
-            border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px;
-            position: relative;
-        }
-        .slot::after {
-            content: attr(data-label);
-            position: absolute; bottom: -25px; width: 100%; text-align: center;
-            color: #444; font-size: 10px; font-family: 'Cinzel'; letter-spacing: 2px;
-        }
-
-        /* 动画元素 */
         .flying-card {
             position: fixed; width: var(--card-w); height: var(--card-h);
             border-radius: 6px; transform-style: preserve-3d;
-            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 50; cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 50; cursor: pointer;
         }
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; overflow: hidden; }
-        
         .back { background-color: #111; background-size: cover; background-position: center; border: 1px solid #444; }
         .back.default { background-image: linear-gradient(45deg, #222 25%, #111 25%), linear-gradient(-45deg, #222 25%, #111 25%); background-size: 4px 4px; }
         .back.moon { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png'); }
         .back.star { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png'); }
         .back.sun  { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png'); }
-
-        .front { 
-            transform: rotateY(180deg); background: #000; 
-            display: flex; flex-direction: column; justify-content: flex-end;
-            box-shadow: inset 0 0 0 1px var(--gold-dim);
-        }
-        
-        .front-content {
-            padding: 8px; text-align: center; background: rgba(0,0,0,0.9);
-            border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px);
-            border-radius: 0; /* 直角 */
-        }
+        .front { transform: rotateY(180deg); background: #000; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: inset 0 0 0 1px var(--gold-dim); }
+        .front-content { padding: 8px; text-align: center; background: rgba(0,0,0,0.9); border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px); }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
-
-        .overlay-mask {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 90;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
-        .flying-card.zoomed {
-            width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
-            z-index: 100;
-            top: 50% !important; left: 50% !important;
-            transform: translate(-50%, -50%) rotateY(180deg) !important;
-            box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
-        }
+        
+        .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        .flying-card.zoomed { width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important; z-index: 100; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) rotateY(180deg) !important; box-shadow: 0 0 60px rgba(157, 0, 255, 0.4); }
         .flying-card.zoomed .card-name { font-size: 24px; margin-bottom: 10px; }
         .flying-card.zoomed .card-keywords { font-size: 14px; color: #fff; transform: scale(1); white-space: normal; }
 
@@ -267,7 +326,36 @@
     <div class="bg-gradient"></div>
     <div class="overlay-mask" id="mask"></div>
 
+    <div class="intro-layer" id="intro-layer">
+        <div class="title-block">
+            <div class="cn-title">
+                <span>命</span><span>运</span><span>回</span><span>响</span>
+            </div>
+            <h1 class="main-title">DESTINY PROTOCOL</h1>
+        </div>
+        
+        <div class="intro-logo-wrapper powered-container">
+            <span class="powered-text">POWERED BY</span>
+            <img src="https://raw.githubusercontent.com/krthaslin/taluopai/main/card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
+        </div>
+    </div>
+
+    <div class="top-brand powered-container" id="top-brand">
+        <span class="powered-text">POWERED BY</span>
+        <img src="https://raw.githubusercontent.com/krthaslin/taluopai/main/card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
+    </div>
+
     <div class="stage-area">
+        
+        <div class="stage-header-wrapper" id="stage-header">
+            <div class="title-block">
+                <div class="cn-title">
+                    <span>命</span><span>运</span><span>回</span><span>响</span>
+                </div>
+                <h1 class="main-title">DESTINY PROTOCOL</h1>
+            </div>
+        </div>
+
         <div class="tornado-wrapper" id="tornado-con"></div>
 
         <div class="magic-circle-container" id="magic-trigger">
@@ -300,11 +388,33 @@
     </div>
 
     <script>
-        function lockViewportHeight() {
-            document.body.style.height = window.innerHeight + 'px';
-        }
-        window.addEventListener('load', lockViewportHeight);
+        function lockViewportHeight() { document.body.style.height = window.innerHeight + 'px'; }
+        
+        window.addEventListener('load', () => {
+            lockViewportHeight();
+            
+            // 1.5秒后开始转场
+            setTimeout(() => {
+                const introLayer = document.getElementById('intro-layer');
+                
+                // 开场淡出
+                introLayer.style.opacity = '0';
+                
+                // 舞台元素淡入
+                document.getElementById('stage-header').style.opacity = '1';
+                document.getElementById('magic-trigger').style.opacity = '1';
+                document.getElementById('controls').style.opacity = '1';
+                
+                // 顶部常驻 Logo 淡入
+                document.getElementById('top-brand').style.opacity = '1';
 
+                // 销毁开场层
+                setTimeout(() => { introLayer.style.display = 'none'; }, 1500);
+
+            }, 1500);
+        });
+
+        /* --- 以下逻辑保持完全不变 --- */
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
@@ -331,15 +441,8 @@
         ];
 
         let state = {
-            shuffling: false,
-            destinyLocked: false,
-            selectedCards: [],
-            currentSlot: 0,
-            cardsRevealed: 0,
-            tornadoCards: [],
-            animationFrame: null,
-            synthesisShown: false,
-            aiSynthesis: null 
+            shuffling: false, destinyLocked: false, selectedCards: [], currentSlot: 0,
+            cardsRevealed: 0, tornadoCards: [], animationFrame: null, synthesisShown: false, aiSynthesis: null 
         };
 
         const trigger = document.getElementById('magic-trigger');
@@ -354,7 +457,6 @@
 
         trigger.addEventListener('mousedown', startChanneling);
         trigger.addEventListener('touchstart', (e) => { e.preventDefault(); startChanneling(); });
-        
         trigger.addEventListener('mouseup', stopChanneling);
         trigger.addEventListener('touchend', stopChanneling);
 
@@ -366,7 +468,6 @@
                 statusText.style.color = "#ff4444";
                 return;
             }
-
             state.shuffling = true;
             ring.classList.add('active');
             circleText.innerText = "能量注入中...";
@@ -379,37 +480,27 @@
             state.shuffling = false;
             ring.classList.remove('active');
             cancelAnimationFrame(state.animationFrame);
-
-            lockDestiny(); 
-            destroyTornado();
+            lockDestiny(); destroyTornado();
         }
 
         function createTornado() {
-            tornadoCon.innerHTML = '';
-            state.tornadoCards = [];
-            
+            tornadoCon.innerHTML = ''; state.tornadoCards = [];
             const isDesktop = window.innerWidth > 768;
-            // 电脑端 60 张，手机端 36 张
             const count = isDesktop ? 60 : 36; 
             const yRange = isDesktop ? 1000 : 600; 
-            const rBase = isDesktop ? 350 : 120;   
-            const rVar = isDesktop ? 400 : 150;    
+            const rBase = isDesktop ? 350 : 120;    
+            const rVar = isDesktop ? 400 : 150;     
 
             for (let i = 0; i < count; i++) {
                 const card = document.createElement('div');
                 card.className = 'storm-card';
                 tornadoCon.appendChild(card);
-                
                 const t = {
-                    el: card,
-                    angle: (i / count) * 360,
-                    y: (Math.random() - 0.5) * yRange, 
-                    radius: rBase + Math.random() * rVar,
-                    baseSpeed: 2 + Math.random() * 3,
-                    speed: 0
+                    el: card, angle: (i / count) * 360,
+                    y: (Math.random() - 0.5) * yRange, radius: rBase + Math.random() * rVar,
+                    baseSpeed: 2 + Math.random() * 3, speed: 0
                 };
                 state.tornadoCards.push(t);
-                
                 setTimeout(() => { card.style.opacity = 0.8; }, Math.random() * 200);
             }
             animateTornado();
@@ -417,11 +508,9 @@
 
         function animateTornado() {
             if (!state.shuffling) return;
-            
             const time = Date.now() / 1000;
             const wave = Math.sin(time * 2); 
             const speedMultiplier = 1 + (wave * 0.5); 
-
             state.tornadoCards.forEach(t => {
                 const currentSpeed = t.baseSpeed * speedMultiplier;
                 t.angle += currentSpeed;
@@ -436,44 +525,31 @@
                 t.el.style.transform = `translateY(0px) rotateY(${t.angle + 180}deg) translateZ(0px) scale(0.1)`;
                 t.el.style.opacity = 0;
             });
-
-            setTimeout(() => {
-                tornadoCon.innerHTML = ''; 
-                showDeckStack();
-            }, 800);
+            setTimeout(() => { tornadoCon.innerHTML = ''; showDeckStack(); }, 800);
         }
 
         function showDeckStack() {
-            trigger.style.opacity = 0; 
-            trigger.style.pointerEvents = 'none';
+            trigger.style.opacity = 0; trigger.style.pointerEvents = 'none';
             controls.style.opacity = 0;
+            document.getElementById('stage-header').style.opacity = 0;
 
             deckStack.style.opacity = 1;
-            
             setTimeout(() => {
-                deckStack.style.pointerEvents = 'auto'; 
-                deckStack.onclick = distributeCard;     
-                
+                deckStack.style.pointerEvents = 'auto'; deckStack.onclick = distributeCard;      
                 statusText.style.color = "#888";
                 statusText.innerText = "命运已定。请依次点击牌堆，抽取过去、现在、未来。";
                 statusText.style.opacity = 1;
-                
-                // 恢复输入框区域显示（仅显示提示语）
-                controls.style.opacity = 1;
-                inputBox.style.display = 'none';
+                controls.style.opacity = 1; inputBox.style.display = 'none';
             }, 800);
         }
 
         function lockDestiny() {
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
             state.selectedCards = [
-                { ...shuffled[0], position: "过去" },
-                { ...shuffled[1], position: "现在" },
-                { ...shuffled[2], position: "未来" }
+                { ...shuffled[0], position: "过去" }, { ...shuffled[1], position: "现在" }, { ...shuffled[2], position: "未来" }
             ];
             state.destinyLocked = true;
             document.getElementById('slots-area').style.opacity = 1;
-
             fetchAiInterpretation(inputBox.value, state.selectedCards);
         }
 
@@ -481,11 +557,9 @@
             console.log("正在请求 AI 解读...");
             try {
                 const response = await fetch('/api/tarot', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: query, cards: cards })
                 });
-                
                 if (response.status === 200) {
                     const data = await response.json();
                     if (data.result && data.result.analysis) {
@@ -494,25 +568,19 @@
                     }
                 }
             } catch (e) {
-                console.error("AI 连接失败", e);
                 state.aiSynthesis = "星象混沌，信号微弱。但牌面的启示已然清晰：过去的影响正在消退，当下的行动决定未来。请相信直觉的指引。";
             }
         }
 
         function distributeCard() {
             if (state.currentSlot > 2) return;
-
             const index = state.currentSlot;
             const targetSlot = document.getElementById(`slot-${index}`);
             const cardData = state.selectedCards[index];
-
             const card = document.createElement('div');
             card.className = 'flying-card';
-            
             let skin = 'default';
-            if (index === 0) skin = 'moon';
-            if (index === 1) skin = 'star';
-            if (index === 2) skin = 'sun';
+            if (index === 0) skin = 'moon'; if (index === 1) skin = 'star'; if (index === 2) skin = 'sun';
 
             card.innerHTML = `
                 <div class="face back ${skin}"></div>
@@ -521,88 +589,48 @@
                         <div class="card-name">${cardData.name}</div>
                         <div class="card-keywords">${cardData.keywords}</div>
                     </div>
-                </div>
-            `;
-
+                </div>`;
             const startRect = deckStack.getBoundingClientRect();
-            card.style.left = startRect.left + 'px';
-            card.style.top = startRect.top + 'px';
+            card.style.left = startRect.left + 'px'; card.style.top = startRect.top + 'px';
             document.body.appendChild(card);
-
             const endRect = targetSlot.getBoundingClientRect();
-            const endX = endRect.left; 
-            const endY = endRect.top;
-
-            requestAnimationFrame(() => {
-                card.style.transform = `translate(${endX - startRect.left}px, ${endY - startRect.top}px)`;
-            });
-
+            requestAnimationFrame(() => { card.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px)`; });
             card.onclick = () => revealCard(card, index);
-
             state.currentSlot++;
             if (state.currentSlot > 2) {
-                deckStack.style.opacity = 0;
-                deckStack.style.pointerEvents = 'none';
+                deckStack.style.opacity = 0; deckStack.style.pointerEvents = 'none';
                 statusText.innerText = "请点击卡片，揭开真相。";
             }
         }
 
         function revealCard(cardEl, index) {
-            cardEl.classList.add('zoomed');
-            document.getElementById('mask').style.opacity = 1;
-
-            cardEl.onclick = (e) => {
-                e.stopPropagation();
-                returnCard(cardEl, index);
-            };
+            cardEl.classList.add('zoomed'); document.getElementById('mask').style.opacity = 1;
+            cardEl.onclick = (e) => { e.stopPropagation(); returnCard(cardEl, index); };
         }
 
         function returnCard(cardEl, index) {
-            cardEl.classList.remove('zoomed');
-            cardEl.classList.add('revealed');
+            cardEl.classList.remove('zoomed'); cardEl.classList.add('revealed');
             document.getElementById('mask').style.opacity = 0;
-            
-            setTimeout(() => {
-                cardEl.onclick = () => revealCard(cardEl, index);
-            }, 300);
-
+            setTimeout(() => { cardEl.onclick = () => revealCard(cardEl, index); }, 300);
             state.cardsRevealed++;
-            if (state.cardsRevealed === 3 && !state.synthesisShown) {
-                state.synthesisShown = true;
-                showSynthesis();
-            }
+            if (state.cardsRevealed === 3 && !state.synthesisShown) { state.synthesisShown = true; showSynthesis(); }
         }
 
         function showSynthesis() {
-            statusText.style.opacity = 0;
-            finalCon.style.opacity = 1;
-            finalCon.style.pointerEvents = 'auto';
-
+            statusText.style.opacity = 0; finalCon.style.opacity = 1; finalCon.style.pointerEvents = 'auto';
             const aiTextElement = document.getElementById('ai-text');
-            
-            if (state.aiSynthesis) {
-                typeWriter(state.aiSynthesis, aiTextElement);
-            } else {
+            if (state.aiSynthesis) { typeWriter(state.aiSynthesis, aiTextElement); } 
+            else {
                 aiTextElement.innerText = "正在接收来自深空的信号...";
                 const checkInterval = setInterval(() => {
-                    if (state.aiSynthesis) {
-                        clearInterval(checkInterval);
-                        typeWriter(state.aiSynthesis, aiTextElement);
-                    }
+                    if (state.aiSynthesis) { clearInterval(checkInterval); typeWriter(state.aiSynthesis, aiTextElement); }
                 }, 500);
             }
         }
 
         function typeWriter(text, element) {
-            element.innerHTML = "";
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, 50);
-                }
-            }
+            element.innerHTML = ""; let i = 0;
+            function type() { if (i < text.length) { element.innerHTML += text.charAt(i); i++; setTimeout(type, 50); } }
             type();
         }
     </script>
