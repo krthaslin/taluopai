@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.17 FINAL</title>
+    <title>DESTINY PROTOCOL V5.18 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,7 @@
             --neon: #9d00ff;
             --mystic-red: #ff4444; 
             
-            /* 移动端尺寸 (保持原样，不缩小) */
+            /* 移动端尺寸 */
             --card-w: 80px; --card-h: 140px;
             --card-w-zoom: 240px; --card-h-zoom: 420px;
             --storm-card-w: 60px; --storm-card-h: 100px;
@@ -160,16 +160,13 @@
             pointer-events: none; transform-style: preserve-3d;
             display: flex; justify-content: center; align-items: center; z-index: 15;
         }
-        
-        /* V5.17: 补全龙卷风卡背金纹 */
         .storm-card {
             width: var(--storm-card-w); height: var(--storm-card-h); position: absolute;
             background: #111; border: 1px solid var(--gold); border-radius: 4px;
             box-shadow: 0 0 15px rgba(157, 0, 255, 0.3);
-            /* 复制自 deck-card-static */
+            /* 龙卷风纹路修复 */
             background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
             background-size: 8px 8px;
-            
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
         }
 
@@ -246,12 +243,11 @@
 
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* V5.17 Mobile Zoom: 像素级刚性锁死布局 */
+        /* Mobile Zoom: 像素级锁死 */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
-                /* 核心：固定50px Top，不再随vh变化 */
                 top: 50px !important; 
                 left: 50% !important;
                 transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
@@ -277,14 +273,13 @@
             display: flex; flex-direction: column;
         }
 
-        /* V5.17 Mobile Panel: 像素级刚性避让 */
+        /* Mobile Panel: 像素级避让 */
         @media (max-width: 767px) {
             .detail-panel {
-                bottom: 0; left: 0; width: 100%; height: 100%; /* 全屏铺开 */
+                bottom: 0; left: 0; width: 100%; height: 100%;
                 background: linear-gradient(to top, #050505 80%, rgba(5,5,5,0.6));
-                border-top: 1px solid transparent; /* 取消顶部边框，更融合 */
+                border-top: 1px solid transparent; 
                 padding: 20px; 
-                /* 核心：50px(Top) + 420px(Card) + 20px(Gap) = 490px */
                 padding-top: 490px; 
                 overflow-y: auto; transform: translateY(0);
             }
@@ -341,12 +336,37 @@
             .final-title::after { margin-left: 10px; }
         }
 
+        /* V5.18 核心修改：星云法旨 (Nebula Decree) 样式 */
         .final-text { 
             color: #fffae0; font-size: 16px; line-height: 1.9; 
             text-align: center; 
-            background: rgba(0,0,0,0.8); padding: 25px; border-radius: 4px;
-            backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            
+            /* 背景：中心黑雾向外扩散 */
+            background: radial-gradient(closest-side, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0) 100%);
+            
+            padding: 30px 10px; 
+            position: relative;
+            
+            /* 去除旧边框 */
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none; /* 不需要模糊，靠黑雾 */
+        }
+
+        /* 顶部金色渐变线 */
+        .final-text::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.7;
+        }
+
+        /* 底部金色渐变线 */
+        .final-text::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.7;
         }
 
         /* 逐行淡出 */
