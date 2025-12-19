@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.18 FINAL</title>
+    <title>DESTINY PROTOCOL V5.19 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,7 +164,7 @@
             width: var(--storm-card-w); height: var(--storm-card-h); position: absolute;
             background: #111; border: 1px solid var(--gold); border-radius: 4px;
             box-shadow: 0 0 15px rgba(157, 0, 255, 0.3);
-            /* 龙卷风纹路修复 */
+            /* V5.17: 龙卷风纹路 */
             background-image: linear-gradient(45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%), linear-gradient(-45deg, rgba(197, 160, 89, 0.1) 25%, transparent 25%);
             background-size: 8px 8px;
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
@@ -243,7 +243,7 @@
 
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* Mobile Zoom: 像素级锁死 */
+        /* V5.17 Mobile Zoom: 像素级锁死 */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
@@ -273,7 +273,7 @@
             display: flex; flex-direction: column;
         }
 
-        /* Mobile Panel: 像素级避让 */
+        /* V5.17 Mobile Panel: 像素级避让 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 100%;
@@ -336,37 +336,37 @@
             .final-title::after { margin-left: 10px; }
         }
 
-        /* V5.18 核心修改：星云法旨 (Nebula Decree) 样式 */
+        /* V5.19 核心修改：星云法旨 (Nebula Decree) 样式优化 */
         .final-text { 
             color: #fffae0; font-size: 16px; line-height: 1.9; 
             text-align: center; 
             
-            /* 背景：中心黑雾向外扩散 */
-            background: radial-gradient(closest-side, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0) 100%);
+            /* 背景：范围扩大，浓度提升，边缘淡出 */
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.8) 50%, transparent 85%);
             
-            padding: 30px 10px; 
+            padding: 30px 20px; 
             position: relative;
+            width: 100%; /* 撑满 */
             
-            /* 去除旧边框 */
             border: none;
             box-shadow: none;
-            backdrop-filter: none; /* 不需要模糊，靠黑雾 */
+            backdrop-filter: none;
         }
 
-        /* 顶部金色渐变线 */
+        /* 顶部金色渐变线：撑满且淡出 */
         .final-text::before {
             content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 60%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            opacity: 0.7;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+            opacity: 0.8;
         }
 
         /* 底部金色渐变线 */
         .final-text::after {
             content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 60%; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            opacity: 0.7;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+            opacity: 0.8;
         }
 
         /* 逐行淡出 */
