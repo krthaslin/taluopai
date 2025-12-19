@@ -600,7 +600,7 @@
         inputBox.addEventListener('input', function() {
             if (this.value.length >= 50) {
                 this.classList.add('limit-reached');
-                statusText.innerHTML = "虚空无法回应冗长的诉求。唯有简短的低语，方能穿透迷雾。";
+                statusText.innerHTML = "虚空无法回应冗长的诉求。<br>唯有简短的低语，方能穿透迷雾。";
                 statusText.classList.add('warning-pulse');
             } else {
                 this.classList.remove('limit-reached');
@@ -952,5 +952,6 @@
     </script>
 </body>
 </html>
+
 
 
