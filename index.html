@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.20 FINAL</title>
+    <title>DESTINY PROTOCOL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -193,10 +193,25 @@
             width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
             border-radius: 8px; color: var(--gold); padding: 12px; text-align: center; outline: none; 
             font-family: 'Noto Serif SC', serif;
+            transition: all 0.3s ease; /* V5.23: 增加过渡效果 */
         }
+        
+        /* V5.23: 输入框达到上限时的警告样式 */
+        .input-box.limit-reached {
+            border-color: var(--mystic-red) !important;
+            color: var(--mystic-red) !important;
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+        }
+
         .status-text {
             margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px;
             height: 20px; text-shadow: 0 2px 4px black; transition: color 0.5s;
+        }
+        
+        /* V5.23: 提示语警告呼吸效果 */
+        .status-text.warning-pulse {
+            color: var(--mystic-red) !important;
+            animation: pulseText 2s infinite;
         }
 
         .slots-container {
@@ -449,7 +464,7 @@
         </div>
 
         <div class="controls-wrapper" id="controls">
-            <input type="text" class="input-box" id="user-input" placeholder="输入所求之事..." autocomplete="off">
+            <input type="text" class="input-box" id="user-input" placeholder="输入所求之事..." autocomplete="off" maxlength="50">
             <div class="status-text" id="status-text"></div>
         </div>
 
@@ -581,10 +596,26 @@
         trigger.addEventListener('mouseup', stopChanneling);
         trigger.addEventListener('touchend', stopChanneling);
 
+        // V5.23: 实时字数监听
+        inputBox.addEventListener('input', function() {
+            if (this.value.length >= 50) {
+                this.classList.add('limit-reached');
+                statusText.innerHTML = "虚空无法回应冗长的诉求。唯有简短的低语，方能穿透迷雾。";
+                statusText.classList.add('warning-pulse');
+            } else {
+                this.classList.remove('limit-reached');
+                if (statusText.classList.contains('warning-pulse')) {
+                    statusText.innerHTML = "";
+                    statusText.classList.remove('warning-pulse');
+                }
+            }
+        });
+
         function startChanneling() {
             if (state.destinyLocked) return;
             
-            const query = inputBox.value;
+            // V5.23: Trim 空格
+            const query = inputBox.value.trim();
             if (!query) {
                 statusText.innerText = "请先输入心中的疑惑...";
                 statusText.style.color = "#ff4444";
@@ -921,5 +952,3 @@
     </script>
 </body>
 </html>
-
-
