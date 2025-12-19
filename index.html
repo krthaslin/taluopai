@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.7 FINAL PERFECT</title>
+    <title>DESTINY PROTOCOL V5.8 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
         
         html, body { 
             margin: 0; padding: 0; width: 100%; 
-            height: 100vh; /* JS 会二次锁定 */
+            height: 100vh; 
             overflow: hidden; 
             background-color: #050505; color: white;
             font-family: 'Noto Serif SC', serif; 
@@ -30,7 +30,6 @@
             --gold-light: #fff8dc;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
-            --void-bg: #050505;
             
             /* 移动端尺寸 */
             --card-w: 80px; --card-h: 140px;
@@ -52,46 +51,27 @@
             z-index: -1;
         }
 
-        /* =========================================
-           标题区样式
-           ========================================= */
+        /* --- 标题区 --- */
         .title-block {
-            display: flex; flex-direction: column;
-            width: fit-content; 
-            position: relative;
-            z-index: 100;
-            pointer-events: none;
-            align-items: center;
+            display: flex; flex-direction: column; width: fit-content; 
+            position: relative; z-index: 100; pointer-events: none; align-items: center;
         }
 
         .cn-title {
-            font-family: 'Noto Serif SC', serif;
-            font-weight: 900; 
-            font-size: 16px; 
-            width: 75%;      
-            margin: 0 auto;  
-            margin-bottom: 6px;
+            font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 16px; 
+            width: 75%; margin: 0 auto 6px auto;
             display: flex; justify-content: space-between; 
             background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: shine 4s linear infinite;
         }
 
         .main-title {
-            font-family: 'Cinzel Decorative', cursive;
-            font-size: 42px;
-            font-weight: 700;
-            line-height: 1;
+            font-family: 'Cinzel Decorative', cursive; font-size: 42px; font-weight: 700; line-height: 1;
             background: linear-gradient(180deg, #fff8dc 20%, #d4af37 80%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(157, 0, 255, 0.3), 0 0 10px rgba(212, 175, 55, 0.2);
-            letter-spacing: 8px; 
-            margin: 0; padding: 0;
-            margin-right: -8px; 
-            white-space: nowrap; 
+            letter-spacing: 8px; margin: 0; padding: 0; margin-right: -8px; white-space: nowrap; 
         }
 
         @media (max-width: 768px) {
@@ -102,46 +82,28 @@
 
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* =========================================
-           POWERED BY
-           ========================================= */
+        /* --- Powered By --- */
         .powered-container {
             display: flex; align-items: center; justify-content: center;
             gap: 6px; font-family: 'Cinzel Decorative', serif;
         }
-        .powered-text {
-            color: #d4af37; font-size: 9px; letter-spacing: 2px; 
-            text-transform: uppercase; padding-top: 1px; opacity: 0.8;
-        }
-        .powered-logo-img {
-            height: 12px; width: auto;
-            filter: grayscale(100%) invert(1) brightness(1.2) sepia(1) hue-rotate(5deg) saturate(1.5);
-            opacity: 0.8;
-        }
+        .powered-text { color: #d4af37; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding-top: 1px; opacity: 0.8; }
+        .powered-logo-img { height: 12px; width: auto; filter: grayscale(100%) invert(1) brightness(1.2) sepia(1) hue-rotate(5deg) saturate(1.5); opacity: 0.8; }
 
-        /* =========================================
-           场景控制
-           ========================================= */
+        /* --- 场景层 --- */
         .intro-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #050505; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center;
-            z-index: 2000; transition: opacity 1.5s ease-in-out;
+            justify-content: center; align-items: center; z-index: 2000; transition: opacity 1.5s ease-in-out;
         }
-        .intro-logo-wrapper {
-            margin-top: 30px; opacity: 0.8; animation: breathe 3s infinite ease-in-out;
-        }
+        .intro-logo-wrapper { margin-top: 30px; opacity: 0.8; animation: breathe 3s infinite ease-in-out; }
         .intro-logo-wrapper .powered-logo-img { height: 16px; }
-        .intro-logo-wrapper .powered-text { font-size: 10px; }
 
         .stage-header-wrapper {
-            position: absolute; top: 15%; width: 100%;
-            display: flex; justify-content: center; z-index: 15;
+            position: absolute; top: 15%; width: 100%; display: flex; justify-content: center; z-index: 15;
             opacity: 0; transition: opacity 2s ease; transform: scale(0.7); 
         }
-        @media (max-width: 768px) {
-            .stage-header-wrapper { top: 12%; transform: scale(1); }
-        }
+        @media (max-width: 768px) { .stage-header-wrapper { top: 12%; transform: scale(1); } }
 
         .top-brand {
             position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
@@ -153,24 +115,20 @@
             50% { opacity: 0.9; transform: scale(1.02); }
         }
 
-        /* =========================================
-           游戏逻辑 UI
-           ========================================= */
+        /* --- 游戏区 --- */
         .stage-area {
-            flex: 70; width: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            flex: 70; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
             position: relative; z-index: 10;
         }
 
+        /* 魔法阵 (输入确认) */
         .magic-circle-container {
             position: absolute; width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 20;
-            top: 50%; /* Mobile */
-            transform: translateY(-50%);
+            cursor: pointer; z-index: 20; top: 50%; transform: translateY(-50%);
             opacity: 0; transition: opacity 2s ease, transform 0.8s;
         }
-        @media (min-width: 768px) { .magic-circle-container { top: 55%; } } /* Desktop */
+        @media (min-width: 768px) { .magic-circle-container { top: 55%; } }
         
         .magic-circle-container:active { transform: translateY(-50%) scale(0.95); }
 
@@ -191,41 +149,23 @@
             top: 0; left: 0; right: 0; bottom: 0; margin: auto;
             animation: rotateSlow 12s linear infinite reverse;
         }
-
         .circle-hint {
             position: absolute; color: var(--gold); font-size: 14px; font-weight: bold;
             text-align: center; pointer-events: none; letter-spacing: 2px;
             text-shadow: 0 0 10px black; animation: pulseText 2s infinite;
         }
 
+        /* 龙卷风与牌堆 */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%; top: 15%; left: 0; 
             pointer-events: none; transform-style: preserve-3d;
             display: flex; justify-content: center; align-items: center; z-index: 15;
         }
         .storm-card {
-            width: var(--storm-card-w); height: var(--storm-card-h);
-            position: absolute;
+            width: var(--storm-card-w); height: var(--storm-card-h); position: absolute;
             background: #111; border: 1px solid var(--gold); border-radius: 4px;
             box-shadow: 0 0 15px rgba(157, 0, 255, 0.3);
             opacity: 0; transition: opacity 0.3s, transform 0.1s;
-        }
-
-        .controls-wrapper {
-            position: absolute; top: 76%; /* Mobile */
-            width: 100%; display: flex; flex-direction: column; align-items: center;
-            z-index: 30; opacity: 0; transition: opacity 2s ease;
-        }
-        @media (min-width: 768px) { .controls-wrapper { top: 85%; } } /* Desktop */
-
-        .input-box {
-            width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
-            border-radius: 8px; color: var(--gold); padding: 12px; text-align: center; outline: none; 
-            font-family: 'Noto Serif SC', serif;
-        }
-        .status-text {
-            margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px;
-            height: 20px; text-shadow: 0 2px 4px black;
         }
 
         .deck-stack {
@@ -241,15 +181,32 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
+        /* 输入与状态 */
+        .controls-wrapper {
+            position: absolute; top: 76%; width: 100%; display: flex; flex-direction: column; align-items: center;
+            z-index: 30; opacity: 0; transition: opacity 2s ease;
+        }
+        @media (min-width: 768px) { .controls-wrapper { top: 85%; } }
+
+        .input-box {
+            width: 260px; background: rgba(255,255,255,0.05); border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 8px; color: var(--gold); padding: 12px; text-align: center; outline: none; 
+            font-family: 'Noto Serif SC', serif;
+        }
+        .status-text {
+            margin-top: 20px; color: #888; font-size: 12px; letter-spacing: 1px;
+            height: 20px; text-shadow: 0 2px 4px black; transition: color 0.5s;
+        }
+
+        /* 底部卡槽 */
         .slots-container {
             flex: 30; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-start;
             padding-top: 10px; opacity: 0; pointer-events: none; transition: opacity 1s;
-            transform: translateY(-15px); /* Mobile */
+            transform: translateY(-15px);
         }
         @media (min-width: 768px) {
-            .slots-container { padding-bottom: 50px; align-items: flex-end; transform: translateY(0); } /* Desktop */
+            .slots-container { padding-bottom: 50px; align-items: flex-end; transform: translateY(0); }
         }
-
         .slot {
             width: var(--card-w); height: var(--card-h);
             border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; position: relative;
@@ -259,80 +216,7 @@
             text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
         }
 
-        /* --- V5.7 核心调整：判词标题光学校正 --- */
-        .final-display {
-            position: absolute; width: 85%; max-width: 600px;
-            text-align: center; opacity: 0; pointer-events: none; transition: opacity 1s ease; 
-            z-index: 30; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-
-        .final-title { 
-            font-family: 'Cinzel Decorative', cursive;
-            font-weight: 700;
-            margin-bottom: 25px; 
-            
-            /* 布局：使用 Flex 对齐线条 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* 关键：移除 gap，使用 margin 单独控制 */
-            gap: 0; 
-            
-            /* 手机端设置 */
-            font-size: 18px; 
-            letter-spacing: 12px; /* 增大字距 */
-            
-            /* 流光特效 */
-            background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
-        }
-
-        /* 伪元素画线 */
-        .final-title::before,
-        .final-title::after {
-            content: '';
-            display: block;
-            width: 30px; 
-            height: 1px; 
-            background: #d4af37;
-            opacity: 0.6;
-        }
-
-        /* 光学校正核心：非对称边距 */
-        .final-title::before {
-            margin-right: 16px; /* 视觉间距 16px */
-        }
-        .final-title::after {
-            /* 目标视觉间距 16px - 末尾字距 12px = 4px */
-            margin-left: 4px; 
-        }
-
-        /* 电脑端适配 */
-        @media (min-width: 768px) {
-            .final-title {
-                font-size: 28px; /* 增大字号 */
-                letter-spacing: 20px; /* 巨大字距 */
-            }
-            .final-title::before, .final-title::after {
-                width: 60px; /* 线条加长 */
-            }
-            .final-title::before { margin-right: 30px; }
-            .final-title::after { margin-left: 10px; } /* 30 - 20 = 10 */
-        }
-
-        .final-text { 
-            color: #fffae0; font-size: 16px; line-height: 1.9; text-align: justify; 
-            background: rgba(0,0,0,0.6); padding: 25px; border-radius: 4px;
-            backdrop-filter: blur(8px);
-            border-top: 1px solid rgba(212, 175, 55, 0.3);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            text-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
-        }
-
+        /* --- 飞行卡牌 & 详情交互 (V5.8 重构) --- */
         .flying-card {
             position: fixed; width: var(--card-w); height: var(--card-h);
             border-radius: 6px; transform-style: preserve-3d;
@@ -344,15 +228,111 @@
         .back.moon { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png'); }
         .back.star { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png'); }
         .back.sun  { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png'); }
+        
         .front { transform: rotateY(180deg); background: #000; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: inset 0 0 0 1px var(--gold-dim); }
+        
+        /* 逆位视觉：只旋转正面的内容容器 */
+        .front.reversed-display { transform: rotateY(180deg) rotate(180deg); }
+
         .front-content { padding: 8px; text-align: center; background: rgba(0,0,0,0.9); border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px); }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
         
-        .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
-        .flying-card.zoomed { width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important; z-index: 100; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) rotateY(180deg) !important; box-shadow: 0 0 60px rgba(157, 0, 255, 0.4); }
-        .flying-card.zoomed .card-name { font-size: 24px; margin-bottom: 10px; }
-        .flying-card.zoomed .card-keywords { font-size: 14px; color: #fff; transform: scale(1); white-space: normal; }
+        .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+
+        /* V5.8: 手机端 Zoom 样式 (上移, 留出下方空间) */
+        @media (max-width: 767px) {
+            .flying-card.zoomed {
+                width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
+                z-index: 100;
+                top: 5% !important; left: 50% !important;
+                /* 手机端稍微缩小一点，给文字留空间 */
+                transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
+                box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
+            }
+            /* 逆位时的 zoom 修正 (继承 rotated 180) */
+            .flying-card.zoomed .front.reversed-display { transform: rotateY(180deg) rotate(180deg) !important; }
+        }
+
+        /* V5.8: 电脑端 Zoom 样式 (左移, 右侧显示文字) */
+        @media (min-width: 768px) {
+            .flying-card.zoomed {
+                width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
+                z-index: 100;
+                top: 50% !important; left: 25% !important; /* 移到左侧 */
+                transform: translate(-50%, -50%) rotateY(180deg) !important;
+                box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
+            }
+        }
+
+        /* --- 详情文字面板 (新增) --- */
+        .detail-panel {
+            position: fixed; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 0.5s, transform 0.5s;
+            display: flex; flex-direction: column;
+        }
+
+        /* 手机端面板 */
+        @media (max-width: 767px) {
+            .detail-panel {
+                bottom: 0; left: 0; width: 100%; height: 55vh;
+                background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
+                border-top: 1px solid var(--gold-dim);
+                padding: 20px; overflow-y: auto; transform: translateY(20px);
+            }
+            .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        }
+
+        /* 电脑端面板 */
+        @media (min-width: 768px) {
+            .detail-panel {
+                top: 50%; right: 10%; width: 40%; max-height: 80vh;
+                transform: translateY(-50%) translateX(20px);
+                background: rgba(0,0,0,0.6); padding: 40px; border-left: 2px solid var(--gold);
+                backdrop-filter: blur(10px);
+            }
+            .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+        }
+
+        .panel-header { font-size: 12px; color: #666; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .panel-title { font-size: 24px; color: var(--gold); font-family: 'Cinzel Decorative'; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;}
+        .panel-tag { font-size: 10px; padding: 2px 6px; border: 1px solid #444; border-radius: 4px; color: #888; }
+        .panel-tag.reversed { border-color: #ff4444; color: #ff8888; }
+        .panel-keywords { color: #888; font-size: 12px; margin-bottom: 20px; font-style: italic; }
+        .panel-ai-text { font-size: 15px; line-height: 1.8; color: #e0e0e0; text-align: justify; }
+        .panel-ai-text .warning { color: #ff6b6b; font-weight: bold; }
+
+        /* --- 最终总结区域 --- */
+        .final-display {
+            position: absolute; width: 85%; max-width: 600px;
+            text-align: center; opacity: 0; pointer-events: none; transition: opacity 1s ease; 
+            z-index: 30; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        .final-title { 
+            font-family: 'Cinzel Decorative', cursive; font-weight: 700; margin-bottom: 25px; 
+            display: flex; align-items: center; justify-content: center; gap: 0; 
+            font-size: 18px; letter-spacing: 12px; 
+            background: linear-gradient(110deg, #d4af37 20%, #fff8dc 50%, #d4af37 80%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        .final-title::before, .final-title::after { content: ''; display: block; width: 30px; height: 1px; background: #d4af37; opacity: 0.6; }
+        .final-title::before { margin-right: 16px; }
+        .final-title::after { margin-left: 4px; }
+
+        @media (min-width: 768px) {
+            .final-title { font-size: 28px; letter-spacing: 20px; }
+            .final-title::before, .final-title::after { width: 60px; }
+            .final-title::before { margin-right: 30px; }
+            .final-title::after { margin-left: 10px; }
+        }
+
+        .final-text { 
+            color: #fffae0; font-size: 16px; line-height: 1.9; text-align: justify; 
+            background: rgba(0,0,0,0.8); padding: 25px; border-radius: 4px;
+            backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
 
         @keyframes rotateSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -364,14 +344,23 @@
     <div class="bg-gradient"></div>
     <div class="overlay-mask" id="mask"></div>
 
+    <div class="detail-panel" id="detail-panel">
+        <div class="panel-header" id="panel-pos">POSITION</div>
+        <div class="panel-title">
+            <span id="panel-name">THE FOOL</span>
+            <span class="panel-tag" id="panel-status">正位</span>
+        </div>
+        <div class="panel-keywords" id="panel-keys">Keywords...</div>
+        <div class="panel-ai-text" id="panel-text">
+            正在解密命运数据...
+        </div>
+    </div>
+
     <div class="intro-layer" id="intro-layer">
         <div class="title-block">
-            <div class="cn-title">
-                <span>命</span><span>运</span><span>回</span><span>响</span>
-            </div>
+            <div class="cn-title"><span>命</span><span>运</span><span>回</span><span>响</span></div>
             <h1 class="main-title">DESTINY PROTOCOL</h1>
         </div>
-        
         <div class="intro-logo-wrapper powered-container">
             <span class="powered-text">POWERED BY</span>
             <img src="https://raw.githubusercontent.com/krthaslin/taluopai/main/card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
@@ -384,12 +373,9 @@
     </div>
 
     <div class="stage-area">
-        
         <div class="stage-header-wrapper" id="stage-header">
             <div class="title-block">
-                <div class="cn-title">
-                    <span>命</span><span>运</span><span>回</span><span>响</span>
-                </div>
+                <div class="cn-title"><span>命</span><span>运</span><span>回</span><span>响</span></div>
                 <h1 class="main-title">DESTINY PROTOCOL</h1>
             </div>
         </div>
@@ -398,7 +384,7 @@
 
         <div class="magic-circle-container" id="magic-trigger">
             <div class="magic-circle" id="magic-ring"></div>
-            <div class="circle-hint" id="circle-text">长按<br>注入能量</div>
+            <div class="circle-hint" id="circle-text">长按<br>同步脑波</div>
         </div>
 
         <div class="deck-stack" id="deck-stack">
@@ -414,8 +400,8 @@
         </div>
 
         <div class="final-display" id="final-con">
-            <div class="final-title">命运回响</div>
-            <div class="final-text" id="ai-text"></div>
+            <div class="final-title">最终协议</div>
+            <div class="final-text" id="ai-final-text"></div>
         </div>
     </div>
 
@@ -426,10 +412,9 @@
     </div>
 
     <script>
-        // 防抖动高度锁定
+        // 1. 视口锁定
         let lockedHeight = window.innerHeight;
         let lockedWidth = window.innerWidth;
-
         function lockViewport() {
             document.body.style.height = `${lockedHeight}px`;
             window.addEventListener('resize', () => {
@@ -443,21 +428,18 @@
         
         window.addEventListener('load', () => {
             lockViewport();
-            
-            // 开屏停留 2 秒
             setTimeout(() => {
                 const introLayer = document.getElementById('intro-layer');
                 introLayer.style.opacity = '0';
-                
                 document.getElementById('stage-header').style.opacity = '1';
                 document.getElementById('magic-trigger').style.opacity = '1';
                 document.getElementById('controls').style.opacity = '1';
                 document.getElementById('top-brand').style.opacity = '1';
-
                 setTimeout(() => { introLayer.style.display = 'none'; }, 1500);
             }, 2000);
         });
 
+        // 2. 塔罗数据 (保持不变)
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/magician.jpg" },
@@ -483,9 +465,19 @@
             { id: "XXI", name: "世界", en: "The World", keywords: "圆满 · 完成 · 旅程", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/world.jpg" }
         ];
 
+        // 3. 游戏状态
         let state = {
-            shuffling: false, destinyLocked: false, selectedCards: [], currentSlot: 0,
-            cardsRevealed: 0, tornadoCards: [], animationFrame: null, synthesisShown: false, aiSynthesis: null 
+            shuffling: false, 
+            destinyLocked: false, 
+            selectedCards: [], 
+            currentSlot: 0,
+            cardsRevealed: 0, 
+            tornadoCards: [], 
+            animationFrame: null, 
+            synthesisShown: false, 
+            // V5.8 AI 数据容器
+            currentAiResponse: null, 
+            isSessionValid: true 
         };
 
         const trigger = document.getElementById('magic-trigger');
@@ -497,25 +489,49 @@
         const deckStack = document.getElementById('deck-stack');
         const controls = document.getElementById('controls');
         const finalCon = document.getElementById('final-con');
+        const detailPanel = document.getElementById('detail-panel');
 
+        // 绑定事件
         trigger.addEventListener('mousedown', startChanneling);
         trigger.addEventListener('touchstart', (e) => { e.preventDefault(); startChanneling(); });
         trigger.addEventListener('mouseup', stopChanneling);
         trigger.addEventListener('touchend', stopChanneling);
 
+        // --- V5.8 核心逻辑：长按瞬间就开始生成数据 ---
         function startChanneling() {
             if (state.destinyLocked) return;
+            
             const query = inputBox.value;
             if (!query) {
                 statusText.innerText = "请先输入心中的疑惑...";
                 statusText.style.color = "#ff4444";
                 return;
             }
+
+            // 1. 启动动画
             state.shuffling = true;
             ring.classList.add('active');
-            circleText.innerText = "能量注入中...";
+            circleText.innerText = "同步脑波中...";
             statusText.innerText = "";
             createTornado();
+
+            // 2. 前端抢跑：立刻锁定命运数据
+            generateDestiny();
+
+            // 3. 立即触发 AI 请求 (不用等动画结束)
+            fetchAiInterpretation(query, state.selectedCards);
+        }
+
+        // 生成命运数据 (含正逆位)
+        function generateDestiny() {
+            const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
+            // 取前三张，并随机生成正逆位
+            state.selectedCards = [
+                { ...shuffled[0], position: "过去", enPos: "PAST", isReversed: Math.random() > 0.5 },
+                { ...shuffled[1], position: "现在", enPos: "PRESENT", isReversed: Math.random() > 0.5 },
+                { ...shuffled[2], position: "未来", enPos: "FUTURE", isReversed: Math.random() > 0.5 }
+            ];
+            console.log("命运已在本地生成:", state.selectedCards);
         }
 
         function stopChanneling() {
@@ -523,7 +539,28 @@
             state.shuffling = false;
             ring.classList.remove('active');
             cancelAnimationFrame(state.animationFrame);
-            lockDestiny(); destroyTornado();
+            lockVisuals(); // 锁定视觉
+            destroyTornado();
+        }
+
+        // V5.8 占位符函数 - 等你提供AI代码
+        // 这里目前只模拟了结构，以保证UI能跑通
+        async function fetchAiInterpretation(query, cards) {
+            console.log("正在请求 AI (模拟)...", query, cards);
+            
+            // --- 这里的代码之后会替换成真实的 API 调用 ---
+            // 模拟延迟
+            setTimeout(() => {
+                // 模拟返回数据
+                state.currentAiResponse = {
+                    valid: true,
+                    card_1_interpretation: "模拟AI回复：针对第一张牌的解读...",
+                    card_2_interpretation: "模拟AI回复：针对第二张牌的解读...",
+                    card_3_interpretation: "模拟AI回复：针对第三张牌的解读...",
+                    final_synthesis: "模拟AI回复：最终总结..."
+                };
+                console.log("AI 数据已就绪 (模拟)");
+            }, 2000); 
         }
 
         function createTornado() {
@@ -532,7 +569,7 @@
             const count = isDesktop ? 60 : 36; 
             const yRange = isDesktop ? 1000 : 600; 
             const rBase = isDesktop ? 350 : 120;    
-            const rVar = isDesktop ? 400 : 150;     
+            const rVar = isDesktop ? 400 : 150;      
 
             for (let i = 0; i < count; i++) {
                 const card = document.createElement('div');
@@ -586,33 +623,9 @@
             }, 800);
         }
 
-        function lockDestiny() {
-            const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
-            state.selectedCards = [
-                { ...shuffled[0], position: "过去" }, { ...shuffled[1], position: "现在" }, { ...shuffled[2], position: "未来" }
-            ];
+        function lockVisuals() {
             state.destinyLocked = true;
             document.getElementById('slots-area').style.opacity = 1;
-            fetchAiInterpretation(inputBox.value, state.selectedCards);
-        }
-
-        async function fetchAiInterpretation(query, cards) {
-            console.log("正在请求 AI 解读...");
-            try {
-                const response = await fetch('/api/tarot', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query, cards: cards })
-                });
-                if (response.status === 200) {
-                    const data = await response.json();
-                    if (data.result && data.result.analysis) {
-                        state.aiSynthesis = data.result.analysis;
-                        console.log("AI 解读已就绪");
-                    }
-                }
-            } catch (e) {
-                state.aiSynthesis = "星象混沌，信号微弱。但牌面的启示已然清晰：过去的影响正在消退，当下的行动决定未来。请相信直觉的指引。";
-            }
         }
 
         function distributeCard() {
@@ -622,51 +635,161 @@
             const cardData = state.selectedCards[index];
             const card = document.createElement('div');
             card.className = 'flying-card';
+            
+            // 皮肤
             let skin = 'default';
             if (index === 0) skin = 'moon'; if (index === 1) skin = 'star'; if (index === 2) skin = 'sun';
 
+            // V5.8: 如果是逆位，给 front 添加 reversed-display 类
+            const reverseClass = cardData.isReversed ? 'reversed-display' : '';
+
             card.innerHTML = `
                 <div class="face back ${skin}"></div>
-                <div class="face front" style="background-image: url('${cardData.img}'); background-size: cover; background-position: center;">
+                <div class="face front ${reverseClass}" style="background-image: url('${cardData.img}'); background-size: cover; background-position: center;">
                     <div class="front-content">
                         <div class="card-name">${cardData.name}</div>
                         <div class="card-keywords">${cardData.keywords}</div>
                     </div>
                 </div>`;
+                
             const startRect = deckStack.getBoundingClientRect();
             card.style.left = startRect.left + 'px'; card.style.top = startRect.top + 'px';
             document.body.appendChild(card);
+            
             const endRect = targetSlot.getBoundingClientRect();
             requestAnimationFrame(() => { card.style.transform = `translate(${endRect.left - startRect.left}px, ${endRect.top - startRect.top}px)`; });
+            
             card.onclick = () => revealCard(card, index);
             state.currentSlot++;
+            
             if (state.currentSlot > 2) {
                 deckStack.style.opacity = 0; deckStack.style.pointerEvents = 'none';
-                statusText.innerText = "请点击卡片，揭开真相。";
+                statusText.innerText = "请点击卡片，查看详情。";
             }
         }
 
+        // V5.8 核心交互：详情展示
         function revealCard(cardEl, index) {
-            cardEl.classList.add('zoomed'); document.getElementById('mask').style.opacity = 1;
-            cardEl.onclick = (e) => { e.stopPropagation(); returnCard(cardEl, index); };
+            // 1. 视觉缩放
+            cardEl.classList.add('zoomed'); 
+            document.getElementById('mask').style.opacity = 1;
+            
+            // 2. 填充详情面板数据
+            const data = state.selectedCards[index];
+            const panelName = document.getElementById('panel-name');
+            const panelStatus = document.getElementById('panel-status');
+            const panelKeys = document.getElementById('panel-keys');
+            const panelText = document.getElementById('panel-text');
+            const panelPos = document.getElementById('panel-pos');
+
+            panelPos.innerText = data.enPos;
+            panelName.innerText = data.en;
+            panelKeys.innerText = data.keywords;
+            
+            // 正逆位标签
+            if (data.isReversed) {
+                panelStatus.innerText = "逆位 (Reversed)";
+                panelStatus.classList.add('reversed');
+            } else {
+                panelStatus.innerText = "正位 (Upright)";
+                panelStatus.classList.remove('reversed');
+            }
+
+            // 填充 AI 文字 (尝试获取)
+            fillAiText(index, panelText);
+
+            // 3. 显示面板
+            detailPanel.classList.add('active');
+
+            // 4. 绑定关闭事件
+            const closeHandler = (e) => { 
+                e.stopPropagation(); 
+                returnCard(cardEl, index); 
+                document.getElementById('mask').removeEventListener('click', closeHandler);
+            };
+            cardEl.onclick = closeHandler;
+            document.getElementById('mask').addEventListener('click', closeHandler);
+        }
+
+        function fillAiText(index, element) {
+            element.innerHTML = "";
+            
+            // 检查是否有 AI 数据
+            if (!state.currentAiResponse) {
+                element.innerHTML = "<span style='color:#888'>正在等待命运协议连接...</span>";
+                // 轮询等待
+                const waitInterval = setInterval(() => {
+                    if (state.currentAiResponse) {
+                        clearInterval(waitInterval);
+                        displayActualText(index, element);
+                    }
+                }, 500);
+            } else {
+                displayActualText(index, element);
+            }
+        }
+
+        function displayActualText(index, element) {
+            const resp = state.currentAiResponse;
+            if (!resp.valid) {
+                element.innerHTML = "<span class='warning'>信号干扰。检测到杂念，无法建立连接。请诚心正念后再试。</span>";
+                return;
+            }
+            // 根据索引取字段
+            let text = "";
+            if (index === 0) text = resp.card_1_interpretation;
+            if (index === 1) text = resp.card_2_interpretation;
+            if (index === 2) text = resp.card_3_interpretation;
+            
+            // 简单的打字机效果
+            let i = 0;
+            function type() { 
+                if (i < text.length) { 
+                    element.innerHTML += text.charAt(i); i++; 
+                    setTimeout(type, 20); // 详情页打字快一点
+                } 
+            }
+            type();
         }
 
         function returnCard(cardEl, index) {
-            cardEl.classList.remove('zoomed'); cardEl.classList.add('revealed');
+            cardEl.classList.remove('zoomed'); 
+            cardEl.classList.add('revealed');
+            detailPanel.classList.remove('active'); // 隐藏面板
             document.getElementById('mask').style.opacity = 0;
+            
             setTimeout(() => { cardEl.onclick = () => revealCard(cardEl, index); }, 300);
-            state.cardsRevealed++;
-            if (state.cardsRevealed === 3 && !state.synthesisShown) { state.synthesisShown = true; showSynthesis(); }
+            
+            // 检查是否全部看完
+            if (!cardEl.hasAttribute('data-read')) {
+                cardEl.setAttribute('data-read', 'true');
+                state.cardsRevealed++;
+                if (state.cardsRevealed === 3 && !state.synthesisShown) { 
+                    state.synthesisShown = true; 
+                    setTimeout(showSynthesis, 1000); // 稍等一下再出总结
+                }
+            }
         }
 
         function showSynthesis() {
-            statusText.style.opacity = 0; finalCon.style.opacity = 1; finalCon.style.pointerEvents = 'auto';
-            const aiTextElement = document.getElementById('ai-text');
-            if (state.aiSynthesis) { typeWriter(state.aiSynthesis, aiTextElement); } 
-            else {
-                aiTextElement.innerText = "正在接收来自深空的信号...";
-                const checkInterval = setInterval(() => {
-                    if (state.aiSynthesis) { clearInterval(checkInterval); typeWriter(state.aiSynthesis, aiTextElement); }
+            statusText.style.opacity = 0; 
+            finalCon.style.opacity = 1; 
+            finalCon.style.pointerEvents = 'auto';
+            const aiTextElement = document.getElementById('ai-final-text');
+            
+            if (state.currentAiResponse && state.currentAiResponse.valid) {
+                typeWriter(state.currentAiResponse.final_synthesis, aiTextElement);
+            } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
+                aiTextElement.innerHTML = "<span class='warning'>本次连接已中断。</span>";
+            } else {
+                // 如果还没拿到数据（极少情况），等待
+                 const checkInterval = setInterval(() => {
+                    if (state.currentAiResponse) { 
+                        clearInterval(checkInterval); 
+                        if(state.currentAiResponse.valid) {
+                             typeWriter(state.currentAiResponse.final_synthesis, aiTextElement); 
+                        }
+                    }
                 }, 500);
             }
         }
@@ -679,5 +802,3 @@
     </script>
 </body>
 </html>
-
-
