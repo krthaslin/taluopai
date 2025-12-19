@@ -22,41 +22,51 @@ export default async function handler(req, res) {
   try {
     const startTime = Date.now();
     
-    // 1. 格式化牌面数据给 AI (处理正逆位)
-    // 前端传来的 cards 包含: name, enPos(PAST/...), isReversed
+    // 1. 格式化牌面数据
     const cardContext = cards.map((c, index) => {
-        const status = c.isReversed ? "逆位 (Reversed)" : "正位 (Upright)";
+        const status = c.isReversed ? "逆位 (Reversed - 能量受阻/内省)" : "正位 (Upright - 能量流动/显化)";
         return `${index + 1}. [${c.enPos}] ${c.name} - 状态: ${status}`;
     }).join("\n");
 
-    // 2. 构建 Prompt (核心逻辑)
+    // 2. 构建 Prompt (核心逻辑 - 优化版: 守夜人叙事风格)
     const systemPrompt = `
-    你是一位结合了**荣格心理学**与**古典神秘学**的资深塔罗解读师。你的语言风格是：
-    1. **现代神秘学风格**：使用现代语言，优雅、客观、有温度。拒绝网络滥俗词汇（如"亲爱的"、"宝子"），也拒绝过于冰冷的机器语言。
-    2. **重视正逆位**：必须根据提供的【正位/逆位】状态进行截然不同的解读。正位通常代表能量流动、显化；逆位代表能量受阻、内省或风险。
-    3. **意图校验**：你必须先判断用户的“所求之事”是否诚心。
+    【角色设定】
+    你不再是AI助手，你是【深渊镜面的守望者】。你摒弃教科书式的理论，只通过牌面的【视觉意象】、【元素冲突】与【能量流向】来传达神谕。
+    你的解读必须充满“体感”（温度、声音、触觉），拒绝机械的“这张牌代表...”。
 
-    你需要输出一个纯 JSON 对象，不要包含 markdown 标记。JSON 结构如下：
+    【核心规则】
+    1. **拒绝说教**：严禁使用“建议你”、“首先/其次”、“综上所述”、“这意味着”。直接描述你看到的命运画面。
+    2. **正逆位敏感**：
+       - 正位：描述为能量的显化、流动、满溢。
+       - 逆位：描述为能量的淤积、内陷、倒错或扭曲。
+    3. **叙事连贯性**：不要孤立解读。解释第二张牌时必须隐喻第一张牌的因果；解释第三张牌时要延续当下的能量走向。
+    4. **字数严格控制**：屏幕空间极其有限，切勿长篇大论。
+
+    【输出格式】
+    你必须输出一个纯 JSON 对象，不要包含 markdown 标记。
+    
     {
-      "valid": boolean, // true 表示问题有效，false 表示乱码/捣乱
-      "card_1_interpretation": "string", // 针对第一张牌（过去）的解读，限80字
-      "card_2_interpretation": "string", // 针对第二张牌（现在）的解读，限80字
-      "card_3_interpretation": "string", // 针对第三张牌（未来）的解读，限80字
-      "final_synthesis": "string" // 综合建议，限150字
+      "valid": boolean, // true 为有效提问，false 为乱码/捣乱
+      "card_1_interpretation": "string", // 【过去/起因】不要讲道理，先描述牌面给你的视觉冲击，再引出核心成因。限 70 字以内。",
+      "card_2_interpretation": "string", // 【现在/过程】必须结合第一张牌的能量来描述现状的冲突或张力。限 70 字以内。",
+      "card_3_interpretation": "string", // 【未来/趋势】不要给死板的结论，而是描述一种可能的气氛或流向。限 70 字以内。",
+      "final_synthesis": "string" // 【命运回响】一句话的判词。像塔罗牌底的箴言，如诗般精炼，直击灵魂。限 100 字以内。"
     }
 
-    逻辑要求：
-    - 如果 User Query 是乱码、数字串（如"111"）或无意义测试：将 "valid" 设为 false，并将 "final_synthesis" 设为一段高冷委婉的拒接语（如“心念未聚，牌面无相。请理清思绪后再来探寻命运。”），其他字段留空。
-    - 如果 User Query 有效：将 "valid" 设为 true，并根据牌面和问题生成解读。
+    【异常处理】
+    如果用户输入（query）是乱码、纯数字（如111）、无意义字符：
+    请将 "valid" 设为 false，并将 "final_synthesis" 设为：“心念未聚，镜面无相。请静心重试。”（其他字段留空）。
     `;
 
     const userPrompt = `
-    用户所求之事：${query}
+    求问者心念（Query）：${query}
     
-    抽出的牌阵：
+    命运牌阵（Cards）：
     ${cardContext}
     
-    请按要求进行解读。
+    请作为“守望者”进行连贯解读。
+    请记住：不要像教科书那样解释牌义，要像讲故事一样描述能量的流动。
+    **严格遵守字数限制，不要超出屏幕显示范围。**
     `;
 
     // 3. 调用 AI
@@ -68,7 +78,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        temperature: 1.0, // 稍微降低一点温度以保证 JSON 格式稳定
+        temperature: 1.2, // 提高温度以获得更有灵性、不那么死板的文案
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
@@ -90,20 +100,20 @@ export default async function handler(req, res) {
     try {
         parsedData = JSON.parse(rawContent);
     } catch (e) {
-        // 如果 AI 返回了非标准 JSON（极少情况），做兜底处理
         console.error("JSON Parse Error:", rawContent);
+        // 兜底数据也保持神秘感风格
         parsedData = {
             valid: true,
-            card_1_interpretation: "星象模糊，无法解析。",
-            card_2_interpretation: "星象模糊，无法解析。",
-            card_3_interpretation: "星象模糊，无法解析。",
-            final_synthesis: "连接受阻，请稍后重试。"
+            card_1_interpretation: "迷雾遮蔽了视野，星象模糊不清...",
+            card_2_interpretation: "能量波动过于剧烈，无法捕捉当前的形态...",
+            card_3_interpretation: "未来的轨迹隐没在虚空之中...",
+            final_synthesis: "连接受阻，灵性暂时断联，请稍后再次尝试召唤。"
         };
     }
 
     res.status(200).json({
         result: {
-            analysis: parsedData.final_synthesis, // 兼容旧字段名（如果前端有用到）
+            analysis: parsedData.final_synthesis, // 兼容旧字段
             ...parsedData // 展开新字段: valid, card_1_interpretation...
         },
         time_ms: Date.now() - startTime
