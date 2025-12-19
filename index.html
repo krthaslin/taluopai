@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.11 FINAL</title>
+    <title>DESTINY PROTOCOL V5.12 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
             --gold-light: #fff8dc;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
-            --mystic-red: #ff4444; /* 新增红色变量 */
+            --mystic-red: #ff4444; 
             
             /* 移动端尺寸 */
             --card-w: 80px; --card-h: 140px;
@@ -240,13 +240,13 @@
 
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* Mobile Zoom */
+        /* Mobile Zoom: V5.12 调整 top 让卡片上浮 */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
-                /* V5.11: 稍微下移一点，视觉平衡 */
-                top: 8% !important; left: 50% !important;
+                top: 5% !important; /* 关键调整：从8%改为5% */
+                left: 50% !important;
                 transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
                 box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
             }
@@ -270,15 +270,14 @@
             display: flex; flex-direction: column;
         }
 
-        /* Mobile Panel: 调整 padding 让文字靠近卡片 */
+        /* Mobile Panel: V5.12 增加 padding-top 让文字下沉 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
                 padding: 20px; 
-                /* V5.11 核心修改: 减少顶部内边距，拉近文字 */
-                padding-top: 60px; 
+                padding-top: 100px; /* 关键调整：增加到100px，拉开距离 */
                 overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
@@ -305,10 +304,7 @@
         .panel-keywords { color: #888; font-size: 12px; margin-bottom: 15px; font-style: italic; }
         
         .panel-ai-text { font-size: 15px; line-height: 1.8; color: #e0e0e0; text-align: justify; }
-        
-        /* V5.11: 警告语颜色改为红色 */
         .panel-ai-text .warning { color: var(--mystic-red); font-weight: bold; }
-        /* V5.11: 小字提示样式 */
         .panel-ai-text .hint-subtext { display: block; margin-top: 10px; font-size: 12px; color: #888; font-style: italic; opacity: 0.8; }
 
         /* --- 最终总结区域 --- */
@@ -338,7 +334,9 @@
         }
 
         .final-text { 
-            color: #fffae0; font-size: 16px; line-height: 1.9; text-align: justify; 
+            color: #fffae0; font-size: 16px; line-height: 1.9; 
+            /* V5.12 关键修改：居中对齐，解决不满一行靠左的问题 */
+            text-align: center; 
             background: rgba(0,0,0,0.8); padding: 25px; border-radius: 4px;
             backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.3);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
@@ -448,7 +446,7 @@
             }, 2000);
         });
 
-        // 2. 塔罗数据 (保持不变)
+        // 2. 塔罗数据
         const TAROT_DATA = [
             { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/fool.jpg" },
             { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/magician.jpg" },
@@ -488,7 +486,6 @@
             isSessionValid: true 
         };
 
-        // --- V5.11 文案库配置 ---
         const invalidPhrases = [
             "心念未聚，牌面无相。唯有诚挚发问，方能拨开迷雾。",
             "虚空不语，因你的叩问缺乏回响的根基。",
@@ -593,7 +590,6 @@
                     }
                 } else {
                     console.error("API Error Status:", response.status);
-                    // 失败兜底 - 随机错误文案
                     const errorMsg = getRandomPhrase(errorPhrases);
                     state.currentAiResponse = { 
                         valid: true, 
@@ -605,7 +601,6 @@
                 }
             } catch (e) {
                 console.error("Fetch Error:", e);
-                // 失败兜底 - 随机错误文案
                 const errorMsg = getRandomPhrase(errorPhrases);
                 state.currentAiResponse = { 
                     valid: true, 
@@ -775,7 +770,6 @@
         function displayActualText(index, element) {
             const resp = state.currentAiResponse;
             if (!resp.valid) {
-                // V5.11 核心修改: 随机乱输入文案 + 小字提示
                 const randomMsg = getRandomPhrase(invalidPhrases);
                 element.innerHTML = `<span class='warning'>${randomMsg}</span><span class='hint-subtext'>${hintSubtext}</span>`;
                 return;
@@ -819,16 +813,9 @@
             finalCon.style.pointerEvents = 'auto';
             const aiTextElement = document.getElementById('ai-final-text');
             
-            // 辅助函数：显示随机错误文案
-            const showRandomError = () => {
-                const randomMsg = getRandomPhrase(errorPhrases);
-                aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
-            };
-
             if (state.currentAiResponse && state.currentAiResponse.valid) {
                 typeWriter(state.currentAiResponse.final_synthesis, aiTextElement);
             } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
-                // 如果是心不诚导致的，这里显示心不诚的随机文案（不带小字）
                 const randomMsg = getRandomPhrase(invalidPhrases);
                 aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
             } else {
