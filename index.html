@@ -239,9 +239,9 @@
         .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; overflow: hidden; }
         .back { background-color: #111; background-size: cover; background-position: center; border: 1px solid #444; }
         .back.default { background-image: linear-gradient(45deg, #222 25%, #111 25%), linear-gradient(-45deg, #222 25%, #111 25%); background-size: 4px 4px; }
-        .back.moon { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.png'); }
-        .back.star { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.png'); }
-        .back.sun  { background-image: url('https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.png'); }
+        .back.moon { background-image: url('card/moon.png'); }
+        .back.star { background-image: url('card/star.png'); }
+        .back.sun  { background-image: url('card/sun.png'); }
         
         .front { transform: rotateY(180deg); background: #000; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: inset 0 0 0 1px var(--gold-dim); }
         
@@ -432,13 +432,13 @@
         </div>
         <div class="intro-logo-wrapper powered-container">
             <span class="powered-text">POWERED BY</span>
-            <img src="https://raw.githubusercontent.com/krthaslin/taluopai/main/card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
+            <img src="card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
         </div>
     </div>
 
     <div class="top-brand powered-container" id="top-brand">
         <span class="powered-text">POWERED BY</span>
-        <img src="https://raw.githubusercontent.com/krthaslin/taluopai/main/card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
+        <img src="card/Unlogomini.png" class="powered-logo-img" alt="UncodeUncle">
     </div>
 
     <div class="stage-area">
@@ -510,28 +510,28 @@
 
         // 2. 塔罗数据
         const TAROT_DATA = [
-            { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/fool.jpg" },
-            { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/magician.jpg" },
-            { id: "II", name: "女祭司", en: "The High Priestess", keywords: "直觉 · 神秘 · 潜意识", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/high_priestess.jpg" },
-            { id: "III", name: "女皇", en: "The Empress", keywords: "丰饶 · 母性 · 自然", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/empress.jpg" },
-            { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 控制", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/emperor.jpg" },
-            { id: "V", name: "教皇", en: "The Hierophant", keywords: "传统 · 信仰 · 学习", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/hierophant.jpg" },
-            { id: "VI", name: "恋人", en: "The Lovers", keywords: "关系 · 选择 · 和谐", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/lovers.jpg" },
-            { id: "VII", name: "战车", en: "The Chariot", keywords: "行动 · 胜利 · 意志力", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/chariot.jpg" },
-            { id: "VIII", name: "力量", en: "Strength", keywords: "勇气 · 耐心 · 同情", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/strength.jpg" },
-            { id: "IX", name: "隐士", en: "The Hermit", keywords: "内省 · 孤独 · 指引", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/hermit.jpg" },
-            { id: "X", name: "命运之轮", en: "Wheel of Fortune", keywords: "流转 · 机遇 · 宿命", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/wheel_of_fortune.jpg" },
-            { id: "XI", name: "正义", en: "Justice", keywords: "公平 · 真理 · 因果", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/justice.jpg" },
-            { id: "XII", name: "倒吊人", en: "The Hanged Man", keywords: "牺牲 · 等待 · 新视角", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/hanged_man.jpg" },
-            { id: "XIII", name: "死神", en: "Death", keywords: "结束 · 转变 · 重生", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/death.jpg" },
-            { id: "XIV", name: "节制", en: "Temperance", keywords: "平衡 · 治愈 · 融合", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/temperance.jpg" },
-            { id: "XV", name: "恶魔", en: "The Devil", keywords: "束缚 · 欲望 · 物质", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/devil.jpg" },
-            { id: "XVI", name: "高塔", en: "The Tower", keywords: "崩塌 · 启示 · 突变", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/tower.jpg" },
-            { id: "XVII", name: "星星", en: "The Star", keywords: "希望 · 灵感 · 宁静", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/star.jpg" },
-            { id: "XVIII", name: "月亮", en: "The Moon", keywords: "幻觉 · 不安 · 潜意识", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/moon.jpg" },
-            { id: "XIX", name: "太阳", en: "The Sun", keywords: "成功 · 喜悦 · 活力", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/sun.jpg" },
-            { id: "XX", name: "审判", en: "Judgement", keywords: "觉醒 · 召唤 · 新生", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/judgement.jpg" },
-            { id: "XXI", name: "世界", en: "The World", keywords: "圆满 · 完成 · 旅程", img: "https://raw.githubusercontent.com/krthaslin/taluopai/main/card/world.jpg" }
+            { id: "0", name: "愚者", en: "The Fool", keywords: "新的开始 · 冒险 · 纯真", img: "card/fool.jpg" },
+            { id: "I", name: "魔术师", en: "The Magician", keywords: "创造力 · 意志 · 显化", img: "card/magician.jpg" },
+            { id: "II", name: "女祭司", en: "The High Priestess", keywords: "直觉 · 神秘 · 潜意识", img: "card/high_priestess.jpg" },
+            { id: "III", name: "女皇", en: "The Empress", keywords: "丰饶 · 母性 · 自然", img: "card/empress.jpg" },
+            { id: "IV", name: "皇帝", en: "The Emperor", keywords: "权威 · 结构 · 控制", img: "card/emperor.jpg" },
+            { id: "V", name: "教皇", en: "The Hierophant", keywords: "传统 · 信仰 · 学习", img: "card/hierophant.jpg" },
+            { id: "VI", name: "恋人", en: "The Lovers", keywords: "关系 · 选择 · 和谐", img: "card/lovers.jpg" },
+            { id: "VII", name: "战车", en: "The Chariot", keywords: "行动 · 胜利 · 意志力", img: "card/chariot.jpg" },
+            { id: "VIII", name: "力量", en: "Strength", keywords: "勇气 · 耐心 · 同情", img: "card/strength.jpg" },
+            { id: "IX", name: "隐士", en: "The Hermit", keywords: "内省 · 孤独 · 指引", img: "card/hermit.jpg" },
+            { id: "X", name: "命运之轮", en: "Wheel of Fortune", keywords: "流转 · 机遇 · 宿命", img: "card/wheel_of_fortune.jpg" },
+            { id: "XI", name: "正义", en: "Justice", keywords: "公平 · 真理 · 因果", img: "card/justice.jpg" },
+            { id: "XII", name: "倒吊人", en: "The Hanged Man", keywords: "牺牲 · 等待 · 新视角", img: "card/hanged_man.jpg" },
+            { id: "XIII", name: "死神", en: "Death", keywords: "结束 · 转变 · 重生", img: "card/death.jpg" },
+            { id: "XIV", name: "节制", en: "Temperance", keywords: "平衡 · 治愈 · 融合", img: "card/temperance.jpg" },
+            { id: "XV", name: "恶魔", en: "The Devil", keywords: "束缚 · 欲望 · 物质", img: "card/devil.jpg" },
+            { id: "XVI", name: "高塔", en: "The Tower", keywords: "崩塌 · 启示 · 突变", img: "card/tower.jpg" },
+            { id: "XVII", name: "星星", en: "The Star", keywords: "希望 · 灵感 · 宁静", img: "card/star.jpg" },
+            { id: "XVIII", name: "月亮", en: "The Moon", keywords: "幻觉 · 不安 · 潜意识", img: "card/moon.jpg" },
+            { id: "XIX", name: "太阳", en: "The Sun", keywords: "成功 · 喜悦 · 活力", img: "card/sun.jpg" },
+            { id: "XX", name: "审判", en: "Judgement", keywords: "觉醒 · 召唤 · 新生", img: "card/judgement.jpg" },
+            { id: "XXI", name: "世界", en: "The World", keywords: "圆满 · 完成 · 旅程", img: "card/world.jpg" }
         ];
 
         // 3. 游戏状态
@@ -952,3 +952,4 @@
     </script>
 </body>
 </html>
+
