@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.14 FINAL</title>
+    <title>DESTINY PROTOCOL V5.15 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,7 +240,7 @@
 
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* Mobile Zoom: 维持 V5.12 布局 (Top 5%) */
+        /* Mobile Zoom */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
@@ -270,14 +270,14 @@
             display: flex; flex-direction: column;
         }
 
-        /* Mobile Panel: 恢复到 V5.12 布局 (padding-top 100px) */
+        /* Mobile Panel: V5.12 布局确认版 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
                 padding: 20px; 
-                padding-top: 100px; /* 恢复 V5.12 数值 */
+                padding-top: 100px; /* 确认使用 100px */
                 overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
@@ -341,11 +341,11 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
-        /* 逐行淡出动画 Class (保留用户请求的功能) */
+        /* V5.15 逐行淡出动画: 3秒慢速 */
         .mystic-line {
             opacity: 0;
             transform: translateY(10px);
-            transition: opacity 1.5s ease, transform 1.5s ease;
+            transition: opacity 3s ease, transform 3s ease; /* 改为3秒 */
             margin-bottom: 8px; 
             display: block; 
         }
@@ -852,7 +852,7 @@
             }
         }
 
-        // 新增动画函数：逐行拆分 + 延时显示
+        // V5.15: 逐行淡出 + 慢速时间轴
         function fadeInTextLineByLine(text, container) {
             const lines = text.split(/[。！？\n]+/).filter(line => line.trim().length > 0);
             
@@ -862,9 +862,10 @@
                 p.innerText = line + "。"; 
                 container.appendChild(p);
 
+                // 核心修改：起步等1秒，每句间隔2.5秒
                 setTimeout(() => {
                     p.classList.add('show');
-                }, index * 1500); // 每行间隔1.5秒
+                }, 1000 + index * 2500);
             });
         }
     </script>
