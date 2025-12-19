@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.9 FINAL</title>
+    <title>DESTINY PROTOCOL V5.10 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -235,7 +235,6 @@
 
         .front-content { 
             padding: 8px; text-align: center; background: rgba(0,0,0,0.9); border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px); 
-            /* 关键修改：放大时带动画消失 */
             transition: opacity 0.5s;
         }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
@@ -243,10 +242,10 @@
         
         .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
 
-        /* 关键修改：Zoomed 状态下，隐藏卡片上的遮盖层文字，避免多余和倒置 */
+        /* Zoomed 状态下隐藏卡片文字 */
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* V5.9 Mobile Zoom: 保持卡片在上方 */
+        /* Mobile Zoom */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
@@ -275,26 +274,29 @@
             display: flex; flex-direction: column;
         }
 
-        /* V5.9 关键修改：手机端增加巨大的 padding-top，让文字给卡片让路 */
+        /* Mobile Panel: 文字内容下移 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
                 padding: 20px; 
-                /* 核心：文字内容下移，不被卡片挡住 */
-                padding-top: 140px; 
+                padding-top: 140px; /* 让出卡片位置 */
                 overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
         }
 
-        /* 电脑端面板 */
+        /* Desktop Panel: 关键调整 - 向上对齐 */
         @media (min-width: 768px) {
             .detail-panel {
                 top: 50%; right: 10%; width: 40%; max-height: 80vh;
                 transform: translateY(-50%) translateX(20px);
-                background: rgba(0,0,0,0.6); padding: 40px; border-left: 2px solid var(--gold);
+                background: rgba(0,0,0,0.6); 
+                /* 关键修复：文字靠上排列，不要居中 */
+                justify-content: flex-start;
+                padding: 40px; 
+                border-left: 2px solid var(--gold);
                 backdrop-filter: blur(10px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
@@ -304,9 +306,12 @@
         .panel-title { font-size: 24px; color: var(--gold); font-family: 'Cinzel Decorative'; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;}
         .panel-tag { font-size: 10px; padding: 2px 6px; border: 1px solid #444; border-radius: 4px; color: #888; }
         .panel-tag.reversed { border-color: #ff4444; color: #ff8888; }
-        .panel-keywords { color: #888; font-size: 12px; margin-bottom: 20px; font-style: italic; }
+        
+        /* 稍微减小关键词下方的间距，让正文更靠近标题 */
+        .panel-keywords { color: #888; font-size: 12px; margin-bottom: 15px; font-style: italic; }
+        
         .panel-ai-text { font-size: 15px; line-height: 1.8; color: #e0e0e0; text-align: justify; }
-        .panel-ai-text .warning { color: #ff6b6b; font-weight: bold; }
+        .panel-ai-text .warning { color: #d4af37; font-style: italic; opacity: 0.9; } /* 警告语改为金色斜体，更神秘 */
 
         /* --- 最终总结区域 --- */
         .final-display {
@@ -359,8 +364,7 @@
         </div>
         <div class="panel-keywords" id="panel-keys">Keywords...</div>
         <div class="panel-ai-text" id="panel-text">
-            正在建立神经连接...
-        </div>
+            </div>
     </div>
 
     <div class="intro-layer" id="intro-layer">
@@ -516,7 +520,7 @@
             // 1. 启动动画
             state.shuffling = true;
             ring.classList.add('active');
-            circleText.innerText = "能量注入中..."; // 文案复原
+            circleText.innerText = "能量注入中..."; 
             statusText.innerText = "";
             createTornado();
 
@@ -547,7 +551,7 @@
             destroyTornado();
         }
 
-        // V5.9 真实 AI 调用
+        // V5.10 真实 AI 调用 + 错误文案优化
         async function fetchAiInterpretation(query, cards) {
             console.log("发起真实请求...", query, cards);
             
@@ -567,12 +571,24 @@
                     }
                 } else {
                     console.error("API Error Status:", response.status);
-                    // 失败兜底
-                    state.currentAiResponse = { valid: true, card_1_interpretation: "信号微弱...", card_2_interpretation: "无法连接...", card_3_interpretation: "无法连接...", final_synthesis: "连接超时。" };
+                    // 失败兜底 - 神秘学文案
+                    state.currentAiResponse = { 
+                        valid: true, 
+                        card_1_interpretation: "迷雾笼罩...", 
+                        card_2_interpretation: "无法看清...", 
+                        card_3_interpretation: "无法看清...", 
+                        final_synthesis: "星象晦暗，灵性链接暂时归于沉寂。" 
+                    };
                 }
             } catch (e) {
                 console.error("Fetch Error:", e);
-                state.currentAiResponse = { valid: true, card_1_interpretation: "网络波动...", card_2_interpretation: "无法解析...", card_3_interpretation: "无法解析...", final_synthesis: "请检查网络连接。" };
+                state.currentAiResponse = { 
+                    valid: true, 
+                    card_1_interpretation: "虚空震荡...", 
+                    card_2_interpretation: "无法建立连接...", 
+                    card_3_interpretation: "无法建立连接...", 
+                    final_synthesis: "虚空扰动，命运的低语模糊不清。" 
+                };
             }
         }
 
@@ -719,7 +735,8 @@
             element.innerHTML = "";
             
             if (!state.currentAiResponse) {
-                element.innerHTML = "<span style='color:#888'>正在接收信号...</span>";
+                // V5.10 文案优化：加载中
+                element.innerHTML = "<span style='color:#888'>正在聆听虚空的低语...</span>";
                 const waitInterval = setInterval(() => {
                     if (state.currentAiResponse) {
                         clearInterval(waitInterval);
@@ -734,7 +751,8 @@
         function displayActualText(index, element) {
             const resp = state.currentAiResponse;
             if (!resp.valid) {
-                element.innerHTML = "<span class='warning'>信号干扰。检测到杂念，无法建立连接。请诚心正念后再试。</span>";
+                // V5.10 文案优化：心不诚/乱输入
+                element.innerHTML = "<span class='warning'>心念未聚，牌面无相。唯有诚挚发问，方能拨开迷雾见真章。</span>";
                 return;
             }
             let text = "";
@@ -779,13 +797,16 @@
             if (state.currentAiResponse && state.currentAiResponse.valid) {
                 typeWriter(state.currentAiResponse.final_synthesis, aiTextElement);
             } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
-                aiTextElement.innerHTML = "<span class='warning'>本次连接已中断。</span>";
+                // V5.10 文案优化：心不诚
+                aiTextElement.innerHTML = "<span class='warning'>虚空沉寂，未有回响。</span>";
             } else {
                  const checkInterval = setInterval(() => {
                     if (state.currentAiResponse) { 
                         clearInterval(checkInterval); 
                         if(state.currentAiResponse.valid) {
                              typeWriter(state.currentAiResponse.final_synthesis, aiTextElement); 
+                        } else {
+                             aiTextElement.innerHTML = "<span class='warning'>虚空沉寂，未有回响。</span>";
                         }
                     }
                 }, 500);
