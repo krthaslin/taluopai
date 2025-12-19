@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.8 FINAL</title>
+    <title>DESTINY PROTOCOL V5.9 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,7 +121,7 @@
             position: relative; z-index: 10;
         }
 
-        /* 魔法阵 (输入确认) */
+        /* 魔法阵 */
         .magic-circle-container {
             position: absolute; width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
@@ -216,7 +216,7 @@
             text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
         }
 
-        /* --- 飞行卡牌 & 详情交互 (V5.8 重构) --- */
+        /* --- 飞行卡牌 & 详情交互 --- */
         .flying-card {
             position: fixed; width: var(--card-w); height: var(--card-h);
             border-radius: 6px; transform-style: preserve-3d;
@@ -231,53 +231,60 @@
         
         .front { transform: rotateY(180deg); background: #000; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: inset 0 0 0 1px var(--gold-dim); }
         
-        /* 逆位视觉：只旋转正面的内容容器 */
         .front.reversed-display { transform: rotateY(180deg) rotate(180deg); }
 
-        .front-content { padding: 8px; text-align: center; background: rgba(0,0,0,0.9); border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px); }
+        .front-content { 
+            padding: 8px; text-align: center; background: rgba(0,0,0,0.9); border-top: 1px solid var(--gold-dim); backdrop-filter: blur(4px); 
+            /* 关键修改：放大时带动画消失 */
+            transition: opacity 0.5s;
+        }
         .card-name { color: var(--gold); font-size: 14px; font-weight: bold; margin-bottom: 2px; }
         .card-keywords { color: #aaa; font-size: 10px; transform: scale(0.9); white-space: nowrap; }
         
         .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
 
-        /* V5.8: 手机端 Zoom 样式 (上移, 留出下方空间) */
+        /* 关键修改：Zoomed 状态下，隐藏卡片上的遮盖层文字，避免多余和倒置 */
+        .flying-card.zoomed .front-content { opacity: 0; }
+
+        /* V5.9 Mobile Zoom: 保持卡片在上方 */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
                 top: 5% !important; left: 50% !important;
-                /* 手机端稍微缩小一点，给文字留空间 */
                 transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
                 box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
             }
-            /* 逆位时的 zoom 修正 (继承 rotated 180) */
             .flying-card.zoomed .front.reversed-display { transform: rotateY(180deg) rotate(180deg) !important; }
         }
 
-        /* V5.8: 电脑端 Zoom 样式 (左移, 右侧显示文字) */
+        /* Desktop Zoom */
         @media (min-width: 768px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
-                top: 50% !important; left: 25% !important; /* 移到左侧 */
+                top: 50% !important; left: 25% !important; 
                 transform: translate(-50%, -50%) rotateY(180deg) !important;
                 box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
             }
         }
 
-        /* --- 详情文字面板 (新增) --- */
+        /* --- 详情文字面板 --- */
         .detail-panel {
             position: fixed; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 0.5s, transform 0.5s;
             display: flex; flex-direction: column;
         }
 
-        /* 手机端面板 */
+        /* V5.9 关键修改：手机端增加巨大的 padding-top，让文字给卡片让路 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
-                padding: 20px; overflow-y: auto; transform: translateY(20px);
+                padding: 20px; 
+                /* 核心：文字内容下移，不被卡片挡住 */
+                padding-top: 140px; 
+                overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
         }
@@ -352,7 +359,7 @@
         </div>
         <div class="panel-keywords" id="panel-keys">Keywords...</div>
         <div class="panel-ai-text" id="panel-text">
-            正在解密命运数据...
+            正在建立神经连接...
         </div>
     </div>
 
@@ -384,7 +391,7 @@
 
         <div class="magic-circle-container" id="magic-trigger">
             <div class="magic-circle" id="magic-ring"></div>
-            <div class="circle-hint" id="circle-text">长按<br>同步脑波</div>
+            <div class="circle-hint" id="circle-text">长按<br>注入能量</div>
         </div>
 
         <div class="deck-stack" id="deck-stack">
@@ -400,7 +407,7 @@
         </div>
 
         <div class="final-display" id="final-con">
-            <div class="final-title">最终协议</div>
+            <div class="final-title">命运回响</div>
             <div class="final-text" id="ai-final-text"></div>
         </div>
     </div>
@@ -475,7 +482,6 @@
             tornadoCards: [], 
             animationFrame: null, 
             synthesisShown: false, 
-            // V5.8 AI 数据容器
             currentAiResponse: null, 
             isSessionValid: true 
         };
@@ -497,7 +503,6 @@
         trigger.addEventListener('mouseup', stopChanneling);
         trigger.addEventListener('touchend', stopChanneling);
 
-        // --- V5.8 核心逻辑：长按瞬间就开始生成数据 ---
         function startChanneling() {
             if (state.destinyLocked) return;
             
@@ -511,21 +516,20 @@
             // 1. 启动动画
             state.shuffling = true;
             ring.classList.add('active');
-            circleText.innerText = "同步脑波中...";
+            circleText.innerText = "能量注入中..."; // 文案复原
             statusText.innerText = "";
             createTornado();
 
             // 2. 前端抢跑：立刻锁定命运数据
             generateDestiny();
 
-            // 3. 立即触发 AI 请求 (不用等动画结束)
+            // 3. 立即触发 真实的 AI 请求
             fetchAiInterpretation(query, state.selectedCards);
         }
 
         // 生成命运数据 (含正逆位)
         function generateDestiny() {
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
-            // 取前三张，并随机生成正逆位
             state.selectedCards = [
                 { ...shuffled[0], position: "过去", enPos: "PAST", isReversed: Math.random() > 0.5 },
                 { ...shuffled[1], position: "现在", enPos: "PRESENT", isReversed: Math.random() > 0.5 },
@@ -543,24 +547,33 @@
             destroyTornado();
         }
 
-        // V5.8 占位符函数 - 等你提供AI代码
-        // 这里目前只模拟了结构，以保证UI能跑通
+        // V5.9 真实 AI 调用
         async function fetchAiInterpretation(query, cards) {
-            console.log("正在请求 AI (模拟)...", query, cards);
+            console.log("发起真实请求...", query, cards);
             
-            // --- 这里的代码之后会替换成真实的 API 调用 ---
-            // 模拟延迟
-            setTimeout(() => {
-                // 模拟返回数据
-                state.currentAiResponse = {
-                    valid: true,
-                    card_1_interpretation: "模拟AI回复：针对第一张牌的解读...",
-                    card_2_interpretation: "模拟AI回复：针对第二张牌的解读...",
-                    card_3_interpretation: "模拟AI回复：针对第三张牌的解读...",
-                    final_synthesis: "模拟AI回复：最终总结..."
-                };
-                console.log("AI 数据已就绪 (模拟)");
-            }, 2000); 
+            try {
+                // 确保你的后端路径是 /api/tarot
+                const response = await fetch('/api/tarot', {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, cards: cards })
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.result) {
+                        state.currentAiResponse = data.result;
+                        console.log("AI 数据接收成功:", state.currentAiResponse);
+                    }
+                } else {
+                    console.error("API Error Status:", response.status);
+                    // 失败兜底
+                    state.currentAiResponse = { valid: true, card_1_interpretation: "信号微弱...", card_2_interpretation: "无法连接...", card_3_interpretation: "无法连接...", final_synthesis: "连接超时。" };
+                }
+            } catch (e) {
+                console.error("Fetch Error:", e);
+                state.currentAiResponse = { valid: true, card_1_interpretation: "网络波动...", card_2_interpretation: "无法解析...", card_3_interpretation: "无法解析...", final_synthesis: "请检查网络连接。" };
+            }
         }
 
         function createTornado() {
@@ -636,11 +649,9 @@
             const card = document.createElement('div');
             card.className = 'flying-card';
             
-            // 皮肤
             let skin = 'default';
             if (index === 0) skin = 'moon'; if (index === 1) skin = 'star'; if (index === 2) skin = 'sun';
 
-            // V5.8: 如果是逆位，给 front 添加 reversed-display 类
             const reverseClass = cardData.isReversed ? 'reversed-display' : '';
 
             card.innerHTML = `
@@ -668,13 +679,10 @@
             }
         }
 
-        // V5.8 核心交互：详情展示
         function revealCard(cardEl, index) {
-            // 1. 视觉缩放
             cardEl.classList.add('zoomed'); 
             document.getElementById('mask').style.opacity = 1;
             
-            // 2. 填充详情面板数据
             const data = state.selectedCards[index];
             const panelName = document.getElementById('panel-name');
             const panelStatus = document.getElementById('panel-status');
@@ -686,7 +694,6 @@
             panelName.innerText = data.en;
             panelKeys.innerText = data.keywords;
             
-            // 正逆位标签
             if (data.isReversed) {
                 panelStatus.innerText = "逆位 (Reversed)";
                 panelStatus.classList.add('reversed');
@@ -695,13 +702,10 @@
                 panelStatus.classList.remove('reversed');
             }
 
-            // 填充 AI 文字 (尝试获取)
             fillAiText(index, panelText);
 
-            // 3. 显示面板
             detailPanel.classList.add('active');
 
-            // 4. 绑定关闭事件
             const closeHandler = (e) => { 
                 e.stopPropagation(); 
                 returnCard(cardEl, index); 
@@ -714,10 +718,8 @@
         function fillAiText(index, element) {
             element.innerHTML = "";
             
-            // 检查是否有 AI 数据
             if (!state.currentAiResponse) {
-                element.innerHTML = "<span style='color:#888'>正在等待命运协议连接...</span>";
-                // 轮询等待
+                element.innerHTML = "<span style='color:#888'>正在接收信号...</span>";
                 const waitInterval = setInterval(() => {
                     if (state.currentAiResponse) {
                         clearInterval(waitInterval);
@@ -735,18 +737,16 @@
                 element.innerHTML = "<span class='warning'>信号干扰。检测到杂念，无法建立连接。请诚心正念后再试。</span>";
                 return;
             }
-            // 根据索引取字段
             let text = "";
             if (index === 0) text = resp.card_1_interpretation;
             if (index === 1) text = resp.card_2_interpretation;
             if (index === 2) text = resp.card_3_interpretation;
             
-            // 简单的打字机效果
             let i = 0;
             function type() { 
                 if (i < text.length) { 
                     element.innerHTML += text.charAt(i); i++; 
-                    setTimeout(type, 20); // 详情页打字快一点
+                    setTimeout(type, 20); 
                 } 
             }
             type();
@@ -755,18 +755,17 @@
         function returnCard(cardEl, index) {
             cardEl.classList.remove('zoomed'); 
             cardEl.classList.add('revealed');
-            detailPanel.classList.remove('active'); // 隐藏面板
+            detailPanel.classList.remove('active'); 
             document.getElementById('mask').style.opacity = 0;
             
             setTimeout(() => { cardEl.onclick = () => revealCard(cardEl, index); }, 300);
             
-            // 检查是否全部看完
             if (!cardEl.hasAttribute('data-read')) {
                 cardEl.setAttribute('data-read', 'true');
                 state.cardsRevealed++;
                 if (state.cardsRevealed === 3 && !state.synthesisShown) { 
                     state.synthesisShown = true; 
-                    setTimeout(showSynthesis, 1000); // 稍等一下再出总结
+                    setTimeout(showSynthesis, 1000); 
                 }
             }
         }
@@ -782,7 +781,6 @@
             } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
                 aiTextElement.innerHTML = "<span class='warning'>本次连接已中断。</span>";
             } else {
-                // 如果还没拿到数据（极少情况），等待
                  const checkInterval = setInterval(() => {
                     if (state.currentAiResponse) { 
                         clearInterval(checkInterval); 
