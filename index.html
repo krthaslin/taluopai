@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.12 FINAL</title>
+    <title>DESTINY PROTOCOL V5.14 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,12 +240,12 @@
 
         .flying-card.zoomed .front-content { opacity: 0; }
 
-        /* Mobile Zoom: V5.12 调整 top 让卡片上浮 */
+        /* Mobile Zoom: 维持 V5.12 布局 (Top 5%) */
         @media (max-width: 767px) {
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
-                top: 5% !important; /* 关键调整：从8%改为5% */
+                top: 5% !important; 
                 left: 50% !important;
                 transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
                 box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
@@ -270,14 +270,14 @@
             display: flex; flex-direction: column;
         }
 
-        /* Mobile Panel: V5.12 增加 padding-top 让文字下沉 */
+        /* Mobile Panel: 恢复到 V5.12 布局 (padding-top 100px) */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
                 padding: 20px; 
-                padding-top: 100px; /* 关键调整：增加到100px，拉开距离 */
+                padding-top: 100px; /* 恢复 V5.12 数值 */
                 overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
@@ -335,11 +335,23 @@
 
         .final-text { 
             color: #fffae0; font-size: 16px; line-height: 1.9; 
-            /* V5.12 关键修改：居中对齐，解决不满一行靠左的问题 */
             text-align: center; 
             background: rgba(0,0,0,0.8); padding: 25px; border-radius: 4px;
             backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.3);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* 逐行淡出动画 Class (保留用户请求的功能) */
+        .mystic-line {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+            margin-bottom: 8px; 
+            display: block; 
+        }
+        .mystic-line.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         @keyframes rotateSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -752,7 +764,7 @@
         }
 
         function fillAiText(index, element) {
-            element.innerHTML = "";
+            element.innerHTML = ""; // 核心修复：先清空，防止残留
             
             if (!state.currentAiResponse) {
                 element.innerHTML = "<span style='color:#888'>正在聆听虚空的低语...</span>";
@@ -768,6 +780,7 @@
         }
 
         function displayActualText(index, element) {
+            element.innerHTML = ""; // 再次确认清空
             const resp = state.currentAiResponse;
             if (!resp.valid) {
                 const randomMsg = getRandomPhrase(invalidPhrases);
@@ -812,9 +825,15 @@
             finalCon.style.opacity = 1; 
             finalCon.style.pointerEvents = 'auto';
             const aiTextElement = document.getElementById('ai-final-text');
-            
+            aiTextElement.innerHTML = ""; // 先清空，给新动画腾地方
+
+            // 使用新的逐行淡出动画
+            const startFade = (textStr) => {
+                fadeInTextLineByLine(textStr, aiTextElement);
+            };
+
             if (state.currentAiResponse && state.currentAiResponse.valid) {
-                typeWriter(state.currentAiResponse.final_synthesis, aiTextElement);
+                startFade(state.currentAiResponse.final_synthesis);
             } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
                 const randomMsg = getRandomPhrase(invalidPhrases);
                 aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
@@ -823,7 +842,7 @@
                     if (state.currentAiResponse) { 
                         clearInterval(checkInterval); 
                         if(state.currentAiResponse.valid) {
-                             typeWriter(state.currentAiResponse.final_synthesis, aiTextElement); 
+                             startFade(state.currentAiResponse.final_synthesis); 
                         } else {
                              const randomMsg = getRandomPhrase(invalidPhrases);
                              aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
@@ -833,10 +852,20 @@
             }
         }
 
-        function typeWriter(text, element) {
-            element.innerHTML = ""; let i = 0;
-            function type() { if (i < text.length) { element.innerHTML += text.charAt(i); i++; setTimeout(type, 50); } }
-            type();
+        // 新增动画函数：逐行拆分 + 延时显示
+        function fadeInTextLineByLine(text, container) {
+            const lines = text.split(/[。！？\n]+/).filter(line => line.trim().length > 0);
+            
+            lines.forEach((line, index) => {
+                const p = document.createElement('span'); 
+                p.className = 'mystic-line';
+                p.innerText = line + "。"; 
+                container.appendChild(p);
+
+                setTimeout(() => {
+                    p.classList.add('show');
+                }, index * 1500); // 每行间隔1.5秒
+            });
         }
     </script>
 </body>
