@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESTINY PROTOCOL V5.10 FINAL</title>
+    <title>DESTINY PROTOCOL V5.11 FINAL</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +30,7 @@
             --gold-light: #fff8dc;
             --gold-dim: rgba(212, 175, 55, 0.5);
             --neon: #9d00ff;
+            --mystic-red: #ff4444; /* 新增红色变量 */
             
             /* 移动端尺寸 */
             --card-w: 80px; --card-h: 140px;
@@ -121,7 +122,6 @@
             position: relative; z-index: 10;
         }
 
-        /* 魔法阵 */
         .magic-circle-container {
             position: absolute; width: 160px; height: 160px;
             display: flex; justify-content: center; align-items: center;
@@ -155,7 +155,6 @@
             text-shadow: 0 0 10px black; animation: pulseText 2s infinite;
         }
 
-        /* 龙卷风与牌堆 */
         .tornado-wrapper {
             position: absolute; width: 100%; height: 100%; top: 15%; left: 0; 
             pointer-events: none; transform-style: preserve-3d;
@@ -181,7 +180,6 @@
             background-size: 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* 输入与状态 */
         .controls-wrapper {
             position: absolute; top: 76%; width: 100%; display: flex; flex-direction: column; align-items: center;
             z-index: 30; opacity: 0; transition: opacity 2s ease;
@@ -198,7 +196,6 @@
             height: 20px; text-shadow: 0 2px 4px black; transition: color 0.5s;
         }
 
-        /* 底部卡槽 */
         .slots-container {
             flex: 30; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-start;
             padding-top: 10px; opacity: 0; pointer-events: none; transition: opacity 1s;
@@ -216,7 +213,6 @@
             text-align: center; color: #444; font-size: 10px; font-family: 'Cinzel';
         }
 
-        /* --- 飞行卡牌 & 详情交互 --- */
         .flying-card {
             position: fixed; width: var(--card-w); height: var(--card-h);
             border-radius: 6px; transform-style: preserve-3d;
@@ -242,7 +238,6 @@
         
         .overlay-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
 
-        /* Zoomed 状态下隐藏卡片文字 */
         .flying-card.zoomed .front-content { opacity: 0; }
 
         /* Mobile Zoom */
@@ -250,7 +245,8 @@
             .flying-card.zoomed {
                 width: var(--card-w-zoom) !important; height: var(--card-h-zoom) !important;
                 z-index: 100;
-                top: 5% !important; left: 50% !important;
+                /* V5.11: 稍微下移一点，视觉平衡 */
+                top: 8% !important; left: 50% !important;
                 transform: translate(-50%, 0) scale(0.85) rotateY(180deg) !important; 
                 box-shadow: 0 0 60px rgba(157, 0, 255, 0.4);
             }
@@ -274,26 +270,26 @@
             display: flex; flex-direction: column;
         }
 
-        /* Mobile Panel: 文字内容下移 */
+        /* Mobile Panel: 调整 padding 让文字靠近卡片 */
         @media (max-width: 767px) {
             .detail-panel {
                 bottom: 0; left: 0; width: 100%; height: 55vh;
                 background: linear-gradient(to top, #050505 90%, rgba(5,5,5,0.8));
                 border-top: 1px solid var(--gold-dim);
                 padding: 20px; 
-                padding-top: 140px; /* 让出卡片位置 */
+                /* V5.11 核心修改: 减少顶部内边距，拉近文字 */
+                padding-top: 60px; 
                 overflow-y: auto; transform: translateY(20px);
             }
             .detail-panel.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
         }
 
-        /* Desktop Panel: 关键调整 - 向上对齐 */
+        /* Desktop Panel */
         @media (min-width: 768px) {
             .detail-panel {
                 top: 50%; right: 10%; width: 40%; max-height: 80vh;
                 transform: translateY(-50%) translateX(20px);
                 background: rgba(0,0,0,0.6); 
-                /* 关键修复：文字靠上排列，不要居中 */
                 justify-content: flex-start;
                 padding: 40px; 
                 border-left: 2px solid var(--gold);
@@ -306,12 +302,14 @@
         .panel-title { font-size: 24px; color: var(--gold); font-family: 'Cinzel Decorative'; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;}
         .panel-tag { font-size: 10px; padding: 2px 6px; border: 1px solid #444; border-radius: 4px; color: #888; }
         .panel-tag.reversed { border-color: #ff4444; color: #ff8888; }
-        
-        /* 稍微减小关键词下方的间距，让正文更靠近标题 */
         .panel-keywords { color: #888; font-size: 12px; margin-bottom: 15px; font-style: italic; }
         
         .panel-ai-text { font-size: 15px; line-height: 1.8; color: #e0e0e0; text-align: justify; }
-        .panel-ai-text .warning { color: #d4af37; font-style: italic; opacity: 0.9; } /* 警告语改为金色斜体，更神秘 */
+        
+        /* V5.11: 警告语颜色改为红色 */
+        .panel-ai-text .warning { color: var(--mystic-red); font-weight: bold; }
+        /* V5.11: 小字提示样式 */
+        .panel-ai-text .hint-subtext { display: block; margin-top: 10px; font-size: 12px; color: #888; font-style: italic; opacity: 0.8; }
 
         /* --- 最终总结区域 --- */
         .final-display {
@@ -490,6 +488,39 @@
             isSessionValid: true 
         };
 
+        // --- V5.11 文案库配置 ---
+        const invalidPhrases = [
+            "心念未聚，牌面无相。唯有诚挚发问，方能拨开迷雾。",
+            "虚空不语，因你的叩问缺乏回响的根基。",
+            "杂念如尘，蒙蔽星光。请收束思绪，方可见真章。",
+            "命运之轮静止不动，因推动它的意念太过微弱。",
+            "镜中无相，因心无定所。虚妄的试探得不到真实的倒影。",
+            "你的低语消散在以太风暴中，未能触达神谕的核心。",
+            "无源之水，难成图景。空洞的符号无法承载命运的重量。",
+            "群星静默，它们不解无诚之问。",
+            "灵性链接无法锚定游离的意识，请注入真实的愿力。",
+            "命运不可戏弄，虚妄的试探只会得到虚妄的回响。"
+        ];
+
+        const errorPhrases = [
+            "以太乱流阻断了回响。或许此刻并非窥探命运的最佳时机，请稍作歇息。",
+            "灵性链接因剧烈波动而断开。请平复心境，切勿焦躁强求。",
+            "虚空深处传来杂音，掩盖了神谕。这通常意味着提问者心绪未宁。",
+            "星盘运转出现了罕见的停滞。命运拒绝在混乱中显化，请耐心等待能量归位。",
+            "来自彼岸的信号过于微弱。也许宇宙在暗示你：当下的困惑，需由你自己寻找答案。",
+            "维度之门暂时紧闭。过度的试探会扰乱因果，请怀着敬畏之心稍后再试。",
+            "能量场过载，连接被迫中断。凡事不可强求，顺势而为方是智慧。",
+            "潜意识的迷雾太重，无法映照出清晰的倒影。待迷雾散去，真理自现。",
+            "共振频率失调。请试着深呼吸，找回内心的平静，命运自会重新连接。",
+            "不可言说的力量干扰了这次通讯。这不是拒绝，而是宇宙让你‘停下来’的提示。"
+        ];
+
+        const hintSubtext = "（请摒弃杂念，凝神静气。向虚空投射你最真实的疑惑，而非无意义的字符。）";
+
+        function getRandomPhrase(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
         const trigger = document.getElementById('magic-trigger');
         const ring = document.getElementById('magic-ring');
         const circleText = document.getElementById('circle-text');
@@ -501,7 +532,6 @@
         const finalCon = document.getElementById('final-con');
         const detailPanel = document.getElementById('detail-panel');
 
-        // 绑定事件
         trigger.addEventListener('mousedown', startChanneling);
         trigger.addEventListener('touchstart', (e) => { e.preventDefault(); startChanneling(); });
         trigger.addEventListener('mouseup', stopChanneling);
@@ -517,21 +547,15 @@
                 return;
             }
 
-            // 1. 启动动画
             state.shuffling = true;
             ring.classList.add('active');
             circleText.innerText = "能量注入中..."; 
             statusText.innerText = "";
             createTornado();
-
-            // 2. 前端抢跑：立刻锁定命运数据
             generateDestiny();
-
-            // 3. 立即触发 真实的 AI 请求
             fetchAiInterpretation(query, state.selectedCards);
         }
 
-        // 生成命运数据 (含正逆位)
         function generateDestiny() {
             const shuffled = [...TAROT_DATA].sort(() => 0.5 - Math.random());
             state.selectedCards = [
@@ -547,16 +571,14 @@
             state.shuffling = false;
             ring.classList.remove('active');
             cancelAnimationFrame(state.animationFrame);
-            lockVisuals(); // 锁定视觉
+            lockVisuals(); 
             destroyTornado();
         }
 
-        // V5.10 真实 AI 调用 + 错误文案优化
         async function fetchAiInterpretation(query, cards) {
             console.log("发起真实请求...", query, cards);
             
             try {
-                // 确保你的后端路径是 /api/tarot
                 const response = await fetch('/api/tarot', {
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
@@ -571,23 +593,26 @@
                     }
                 } else {
                     console.error("API Error Status:", response.status);
-                    // 失败兜底 - 神秘学文案
+                    // 失败兜底 - 随机错误文案
+                    const errorMsg = getRandomPhrase(errorPhrases);
                     state.currentAiResponse = { 
                         valid: true, 
                         card_1_interpretation: "迷雾笼罩...", 
                         card_2_interpretation: "无法看清...", 
                         card_3_interpretation: "无法看清...", 
-                        final_synthesis: "星象晦暗，灵性链接暂时归于沉寂。" 
+                        final_synthesis: errorMsg 
                     };
                 }
             } catch (e) {
                 console.error("Fetch Error:", e);
+                // 失败兜底 - 随机错误文案
+                const errorMsg = getRandomPhrase(errorPhrases);
                 state.currentAiResponse = { 
                     valid: true, 
                     card_1_interpretation: "虚空震荡...", 
                     card_2_interpretation: "无法建立连接...", 
                     card_3_interpretation: "无法建立连接...", 
-                    final_synthesis: "虚空扰动，命运的低语模糊不清。" 
+                    final_synthesis: errorMsg 
                 };
             }
         }
@@ -735,7 +760,6 @@
             element.innerHTML = "";
             
             if (!state.currentAiResponse) {
-                // V5.10 文案优化：加载中
                 element.innerHTML = "<span style='color:#888'>正在聆听虚空的低语...</span>";
                 const waitInterval = setInterval(() => {
                     if (state.currentAiResponse) {
@@ -751,8 +775,9 @@
         function displayActualText(index, element) {
             const resp = state.currentAiResponse;
             if (!resp.valid) {
-                // V5.10 文案优化：心不诚/乱输入
-                element.innerHTML = "<span class='warning'>心念未聚，牌面无相。唯有诚挚发问，方能拨开迷雾见真章。</span>";
+                // V5.11 核心修改: 随机乱输入文案 + 小字提示
+                const randomMsg = getRandomPhrase(invalidPhrases);
+                element.innerHTML = `<span class='warning'>${randomMsg}</span><span class='hint-subtext'>${hintSubtext}</span>`;
                 return;
             }
             let text = "";
@@ -794,11 +819,18 @@
             finalCon.style.pointerEvents = 'auto';
             const aiTextElement = document.getElementById('ai-final-text');
             
+            // 辅助函数：显示随机错误文案
+            const showRandomError = () => {
+                const randomMsg = getRandomPhrase(errorPhrases);
+                aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
+            };
+
             if (state.currentAiResponse && state.currentAiResponse.valid) {
                 typeWriter(state.currentAiResponse.final_synthesis, aiTextElement);
             } else if (state.currentAiResponse && !state.currentAiResponse.valid) {
-                // V5.10 文案优化：心不诚
-                aiTextElement.innerHTML = "<span class='warning'>虚空沉寂，未有回响。</span>";
+                // 如果是心不诚导致的，这里显示心不诚的随机文案（不带小字）
+                const randomMsg = getRandomPhrase(invalidPhrases);
+                aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
             } else {
                  const checkInterval = setInterval(() => {
                     if (state.currentAiResponse) { 
@@ -806,7 +838,8 @@
                         if(state.currentAiResponse.valid) {
                              typeWriter(state.currentAiResponse.final_synthesis, aiTextElement); 
                         } else {
-                             aiTextElement.innerHTML = "<span class='warning'>虚空沉寂，未有回响。</span>";
+                             const randomMsg = getRandomPhrase(invalidPhrases);
+                             aiTextElement.innerHTML = `<span class='warning'>${randomMsg}</span>`;
                         }
                     }
                 }, 500);
